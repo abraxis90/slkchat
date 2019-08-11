@@ -1,4 +1,5 @@
 import { Action } from '@ngrx/store';
+
 import { Conversation } from './coversation';
 import { Message } from './message';
 
@@ -57,6 +58,6 @@ export class ConversationMessageSend implements Action {
 export class ConversationMessageSendSuccesss implements Action {
   readonly type = ConversationActionTypes.ConversationMessageSendSuccess;
 
-  constructor(public payload: Message) {
+  constructor(public payload: Conversation) {
   }
 }
