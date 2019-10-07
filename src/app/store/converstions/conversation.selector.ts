@@ -1,10 +1,10 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
 
 import { ConversationState } from './conversation.state';
-import { conversationAdapter } from './conversation.adapter';
+import { ConversationAdapter } from './conversation.adapter';
 
 const conversationSelector = createFeatureSelector<ConversationState>('conversation');
-const conversationEntitySelectors = conversationAdapter.getSelectors();
+const conversationEntitySelectors = ConversationAdapter.getSelectors();
 
 export const selectAllConversations = createSelector(
   conversationSelector,

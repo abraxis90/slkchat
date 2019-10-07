@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection, DocumentChangeAction } from '@angular/fire/firestore';
+import { AngularFirestore, AngularFirestoreCollection, DocumentChangeAction, DocumentReference } from '@angular/fire/firestore';
 
 import { Subscription } from 'rxjs';
 
@@ -7,14 +7,10 @@ import { Conversation } from './conversation';
 import { map } from 'rxjs/internal/operators';
 import { Store } from '@ngrx/store';
 import { ConversationLoadSuccess } from './conversation.actions';
-import { User } from '../users/user';
-import { Message } from './message';
 
 interface FirebaseConversation {
-  uid: string;
-  messages: Message[];
   users: string[];
-  lastSent: number | undefined;
+  uid?: string;
 }
 
 @Injectable({
@@ -28,6 +24,7 @@ export class ConversationDispatcherService {
 
   constructor(private readonly afs: AngularFirestore, private store: Store<{ conversations: Conversation[] }>) {
     this.conversationCollection = this.afs.collection<FirebaseConversation>('CONVERSATIONS');
+
     this.conversationUpsertedSubscription = this.conversationCollection.snapshotChanges(['added', 'modified'])
       .pipe(
         map((changeActions: DocumentChangeAction<FirebaseConversation>[]) => {
@@ -43,6 +40,15 @@ export class ConversationDispatcherService {
       .subscribe((conversations: Conversation[]) => {
         this.store.dispatch(new ConversationLoadSuccess(conversations));
       });
+  }
+
+  createConversation(conversation: Conversation): Promise<DocumentReference> {
+    const createdConversation = this.makeDocumentConversation(conversation);
+    return this.conversationCollection.add(createdConversation);
+  }
+
+  private makeDocumentConversation(conversation: Conversation): FirebaseConversation {
+    return { users: conversation.users.map(user => user.uid) };
   }
 
 }

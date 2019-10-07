@@ -19,7 +19,6 @@ interface FirebaseUser {
 @Injectable({
   providedIn: 'root'
 })
-
 export class UserDispatcherService {
 
   private userCollection: AngularFirestoreCollection<FirebaseUser>;
@@ -28,6 +27,7 @@ export class UserDispatcherService {
   constructor(private readonly afs: AngularFirestore,
               private readonly auth: AuthenticationService,
               private readonly store: Store<{ users: User[] }>) {
+
     this.userCollection = this.afs.collection<FirebaseUser>('USERS');
     this.userSubscription = this.userCollection.snapshotChanges()
       .pipe(
