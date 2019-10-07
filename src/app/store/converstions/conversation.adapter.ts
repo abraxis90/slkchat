@@ -1,6 +1,6 @@
 import { createEntityAdapter, EntityAdapter } from '@ngrx/entity';
 
-import { Conversation } from './coversation';
+import { Conversation } from './conversation';
 
 export const conversationAdapter: EntityAdapter<Conversation> =
   createEntityAdapter<Conversation>({

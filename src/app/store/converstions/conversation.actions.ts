@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
 
-import { Conversation } from './coversation';
+import { Conversation } from './conversation';
 import { Message } from './message';
 
 export enum ConversationActionTypes {

@@ -1,0 +1,5 @@
+<mat-list *ngIf="(users$ | async) as users">
+  <mat-action-list *ngFor="let user of users">
+    <button mat-list-item (click)="selectUser(user)">{{ user.fullName }}</button>
+  </mat-action-list>
+</mat-list>

@@ -1,3 +1,9 @@
-<mat-toolbar color="primary">
+<mat-toolbar color="primary" *ngIf="currentUser | async">
   <span>SlkChat</span>
+  <span fxFlex></span>
+  <button (click)="logout()" mat-button>
+    Logout
+  </button>
 </mat-toolbar>
+
+<router-outlet></router-outlet>

@@ -1,0 +1,20 @@
+.conversations-page {
+  .conversation-list {
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+
+    .user-group-comma {
+      margin: 0 4px 0 -4px;
+    }
+  }
+
+  .new-conversation-fab {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin: 16px;
+  }
+}

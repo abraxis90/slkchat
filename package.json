@@ -16,6 +16,8 @@
     "@angular/common": "~8.2.1",
     "@angular/compiler": "~8.2.1",
     "@angular/core": "~8.2.1",
+    "@angular/fire": "^5.2.1",
+    "@angular/flex-layout": "^8.0.0-beta.26",
     "@angular/forms": "~8.2.1",
     "@angular/material": "^8.0.0",
     "@angular/platform-browser": "~8.2.1",
@@ -26,6 +28,7 @@
     "@ngrx/store": "^8.2.0",
     "@ngrx/store-devtools": "^8.2.0",
     "core-js": "^2.5.4",
+    "firebase": "^6.3.5",
     "rxjs": "~6.5.2",
     "tslib": "^1.10.0",
     "zone.js": "~0.9.1"
