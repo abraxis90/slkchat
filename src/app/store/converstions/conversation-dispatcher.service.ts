@@ -8,6 +8,7 @@ import { map } from 'rxjs/internal/operators';
 import { Store } from '@ngrx/store';
 import { ConversationLoadSuccess } from './conversation.actions';
 import { Message } from './message';
+import { AuthenticationService } from '../../services/auth/authentication.service';
 
 interface FirebaseConversation {
   users: string[];
@@ -25,7 +26,10 @@ export class ConversationDispatcherService {
   private currentMessageUpsertedSubscription: Subscription;
 
 
-  constructor(private readonly afs: AngularFirestore, private store: Store<{ conversations: Conversation[] }>) {
+  constructor(private readonly afs: AngularFirestore,
+              private auth: AuthenticationService,
+              private store: Store<{ conversations: Conversation[] }>) {
+
     this.conversationCollection = this.afs.collection<FirebaseConversation>(CONVERSATIONS_PATH);
 
     this.conversationUpsertedSubscription = this.conversationCollection.snapshotChanges(['added', 'modified'])
@@ -33,9 +37,12 @@ export class ConversationDispatcherService {
         map((conversationChangeActions: DocumentChangeAction<FirebaseConversation>[]) => {
           return conversationChangeActions.map((changeAction: DocumentChangeAction<FirebaseConversation>) => {
             const conversationChangeActionData = changeAction.payload.doc.data();
-            const conversationUsers = conversationChangeActionData.users.map(userUid => {
-              return { uid: userUid };
-            });
+            const conversationUsers = conversationChangeActionData.users
+            // filter out own user from conversation participants
+              .filter(userUid => userUid !== this.auth.state.value.uid)
+              .map(userUid => {
+                return { uid: userUid };
+              });
             return new Conversation(changeAction.payload.doc.id, [], conversationUsers, undefined);
           });
         })
@@ -46,8 +53,12 @@ export class ConversationDispatcherService {
   }
 
   createConversation(conversation: Conversation): Promise<DocumentReference> {
-    const createdConversation = this.makeDocumentConversation(conversation);
-    return this.conversationCollection.add(createdConversation);
+    const firebaseConversation = {
+      users: conversation.users
+        .map(user => user.uid)
+        .concat(this.auth.state.value.uid)
+    };
+    return this.conversationCollection.add(firebaseConversation);
   }
 
   loadCurrentMessageCollection(conversationUid: string) {
@@ -74,10 +85,6 @@ export class ConversationDispatcherService {
 
   dropCurrentMessageCollection() {
     this.currentMessageCollection = undefined;
-  }
-
-  private makeDocumentConversation(conversation: Conversation): FirebaseConversation {
-    return { users: conversation.users.map(user => user.uid) };
   }
 
 }

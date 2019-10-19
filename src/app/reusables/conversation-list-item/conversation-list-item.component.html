@@ -1,6 +1,6 @@
 <!-- TODO: display last sent message -->
 <button mat-list-item>
-  <ng-container *ngIf="conversation.users?.length === 1; then privateChat; else groupChat">
+  <ng-container *ngIf="conversation.users?.length === 1 && conversation.users[0]; then privateChat; else groupChat">
   </ng-container>
 </button>
 <ng-template #privateChat>

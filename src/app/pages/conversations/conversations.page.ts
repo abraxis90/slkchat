@@ -12,6 +12,7 @@ import { MatDialog, MatDialogRef } from '@angular/material';
 import { ContactListComponent } from '../../reusables/contact-list/contact-list.component';
 import { ConversationAdd } from '../../store/converstions/conversation.actions';
 import { ConversationDispatcherService } from '../../store/converstions/conversation-dispatcher.service';
+import { AuthenticationService } from '../../services/auth/authentication.service';
 
 @Component({
   selector: 'app-conversations-page',
