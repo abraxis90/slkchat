@@ -5,13 +5,13 @@
 </button>
 <ng-template #privateChat>
   <img class="user-avatar" [src]="conversation.users[0]?.avatarURL" alt="user avatar"/>
-  <span>{{ conversation.users[0].fullName }}</span>
+  <span class="user-full-name" fxFlex>{{ conversation.users[0].fullName }}</span>
 </ng-template>
 
 <ng-template #groupChat>
   <img class="user-avatar" [src]="conversation.users[0]?.avatarURL" alt="user avatar"/>
   <div *ngFor="let user of conversation.users; let last = last">
-    <span>{{ user?.fullName }}</span>
+    <span class="user-full-name" fxFlex>{{ user?.fullName }}</span>
     <span *ngIf="!last" class="user-group-comma">,</span>
   </div>
 </ng-template>
