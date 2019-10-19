@@ -63,4 +63,9 @@ body, html {
   height: 100%;
 }
 
+// respect material design guidelines by uppercasing all button text
+button {
+  text-transform: uppercase;
+}
+
 /* endregion */

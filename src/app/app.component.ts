@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
+import { MatIconRegistry } from '@angular/material';
+import { Router } from '@angular/router';
+import { DomSanitizer } from '@angular/platform-browser';
 import { User } from 'firebase';
 import { Observable } from 'rxjs';
-import { filter, tap } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 
 import { AuthenticationService } from './services/auth/authentication.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -15,10 +17,16 @@ export class AppComponent {
 
   public currentUser: Observable<User | null>;
 
-  constructor(private auth: AuthenticationService, private router: Router) {
+  constructor(private auth: AuthenticationService,
+              private router: Router,
+              private matIconRegistry: MatIconRegistry,
+              private domSanitizer: DomSanitizer) {
+
+    // INIT
+
     this.currentUser = auth.state.pipe(
       tap(user => {
-        // redirect to appropriate routes as a side-effect
+        // redirect to appropriate routes
         if (user !== null) {
           this.router.navigate(['conversations']);
         } else {
@@ -26,8 +34,14 @@ export class AppComponent {
         }
       })
     );
+
+    this.matIconRegistry.addSvgIcon(
+      `google_logo`,
+      this.domSanitizer.bypassSecurityTrustResourceUrl('../assets/google_logo.svg')
+    );
   }
 
+  // TODO: make dedicated toolbar component & move method
   logout(): void {
     this.auth.logout();
   }

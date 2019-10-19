@@ -9,13 +9,13 @@
       </button>
       
       <ng-template #privateChat>
-        <span>{{ conversation.users[0].fullName }}</span>
+        <span>{{ conversation.users[0]?.fullName }}</span>
       </ng-template>
       
       <ng-template #groupChat>
         <div *ngFor="let user of conversation.users; let last = last">
-          <img class="user-avatar" [src]="user.avatarURL"/>
-          <span>{{ user.fullName }}</span>
+          <img class="user-avatar" [src]="user?.avatarURL"/>
+          <span>{{ user?.fullName }}</span>
           <span *ngIf="!last" class="user-group-comma">,</span>
         </div>
       </ng-template>

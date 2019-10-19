@@ -1,9 +1,9 @@
 <div class="authentication-page" fxLayout="column" fxLayoutAlign="center center" fxFill>
-  <div class="authentication-welcome-wrapper" fxLayout="column" fxLayoutAlign="center center">
-    <h1 class="mat-h1">Welcome</h1>
+  <div class="authentication-welcome-container" fxLayout="column" fxLayoutAlign="center center">
     <img src="assets/login.svg" alt="connect">
-    <button (click)="login()" mat-raised-button color="accent">
-      Login
+    <button class="google-sign-in" (click)="login()" mat-raised-button>
+      <mat-icon svgIcon="google_logo" aria-hidden="true"></mat-icon>
+      <span>Sign in with Google</span>
     </button>
   </div>
 </div>

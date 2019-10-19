@@ -4,7 +4,7 @@
   background: linear-gradient(to right, #8f94fb, #4e54c8); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
-.authentication-welcome-wrapper {
+.authentication-welcome-container {
   width: 100%;
   max-width: 500px;
   padding: 0 32px;
@@ -16,5 +16,11 @@
   img {
     width: 100%;
     margin: 32px 0;
+  }
+
+  button.google-sign-in {
+    mat-icon {
+      padding-right: 8px;
+    }
   }
 }
