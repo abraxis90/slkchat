@@ -19,9 +19,8 @@ export class AuthenticationService {
     });
   }
 
-  // TODO: consider returning something other than void
-  login(): void {
-    this.afAuth.auth.signInWithPopup(new auth.GoogleAuthProvider())
+  login(): Promise<void> {
+    return this.afAuth.auth.signInWithRedirect(new auth.GoogleAuthProvider())
       .then()
       .catch(err => console.error(err));
   }

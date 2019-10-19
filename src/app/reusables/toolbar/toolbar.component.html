@@ -1,10 +1,10 @@
 <mat-toolbar *ngIf="currentUser">
-  <img src="../assets/logo_transparent.png" alt="Sleek"/>
+  <img class="logo" src="../assets/logo_transparent.png" alt="Sleek"/>
   <span>Conversations</span>
   <span fxFlex></span>
-  <button class="no-padding"
-          (click)="logout()"
-          mat-button>
-    Logout
+  <button (click)="logout()"
+          color="primary" mat-stroked-button>
+    <img class="user-avatar" [src]="currentUser?.photoURL" alt="your avatar"/>
+    <span>Sign out</span>
   </button>
 </mat-toolbar>

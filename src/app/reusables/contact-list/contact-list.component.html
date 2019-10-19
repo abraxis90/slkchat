@@ -1,4 +1,4 @@
-<h4 class="mat-h3">Start a conversation with:</h4>
+<h4 class="mat-h3">Select a contact:</h4>
 
 <mat-list *ngIf="(users$ | async) as users">
   <mat-action-list *ngFor="let user of users">
@@ -7,5 +7,5 @@
       <span>{{ user.fullName }}</span>
     </button>
   </mat-action-list>
-  <p *ngIf="!users.length">How sad. There are no users in your contact list.</p>
+  <p *ngIf="!users.length">How sad. There are no people in your contact list.</p>
 </mat-list>
