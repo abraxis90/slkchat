@@ -11,6 +11,7 @@ import { selectAllUsers } from '../../store/users/user.selector';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { ContactListComponent } from '../../reusables/contact-list/contact-list.component';
 import { ConversationAdd } from '../../store/converstions/conversation.actions';
+import { ConversationDispatcherService } from '../../store/converstions/conversation-dispatcher.service';
 
 @Component({
   selector: 'app-conversations-page',
@@ -38,11 +39,12 @@ export class ConversationsPageComponent implements OnInit {
     );
 
   constructor(private store: Store<{ users: User[], conversations: Conversation[] }>,
-              private dialog: MatDialog) {
+              private dialog: MatDialog,
+              private conversationDispatcher: ConversationDispatcherService) {
   }
 
   ngOnInit() {
-    this.conversationsDrawable$.subscribe(x => console.log(x));
+    // TODO: remove if unnecessary
   }
 
   createConversation() {
@@ -57,9 +59,12 @@ export class ConversationsPageComponent implements OnInit {
     });
   }
 
+  loadMessages(conversationUid: string) {
+    this.conversationDispatcher.loadCurrentMessageCollection(conversationUid);
+  }
+
   public trackByUid(index, conversation) {
     return conversation ? conversation.uid : undefined;
-
   }
 
   private findUserInList(uid: string, users: User[]): User {
