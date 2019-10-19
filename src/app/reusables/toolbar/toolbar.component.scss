@@ -1,4 +1,8 @@
 mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
   .logo {
     width: 40px;
     height: 40px;

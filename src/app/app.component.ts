@@ -23,7 +23,6 @@ export class AppComponent {
               private domSanitizer: DomSanitizer) {
 
     // INIT
-
     this.currentUser = auth.state.pipe(
       tap(user => {
         // redirect to appropriate routes

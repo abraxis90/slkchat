@@ -1,12 +1,26 @@
 <div class="authentication-page" fxLayout="column" fxLayoutAlign="center center" fxFill>
-  <div class="authentication-welcome-container" fxLayout="column" fxLayoutAlign="center center">
+  
+  <div class="authentication-welcome-container"
+       *ngIf="(!loginInProgress || auth.state.value); else notAuthenticated"
+       fxLayout="column" fxLayoutAlign="center center">
     <img src="assets/login.svg" alt="connect">
-    <button class="google-sign-in" (click)="login()" mat-raised-button>
+    <button class="google-sign-in"
+            (click)="login()"
+            mat-raised-button>
       <mat-icon svgIcon="google_logo" aria-hidden="true"></mat-icon>
       <span>Sign in with Google</span>
     </button>
   </div>
-  <div class="authentication-welcome-container" fxLayout="column" fxLayoutAlign="center center">
-  </div>
+  
+  <ng-template #notAuthenticated>
+    <div class="authentication-welcome-container"
+         fxLayout="column" fxLayoutAlign="center center">
+      <mat-progress-spinner
+          color="accent"
+          mode="indeterminate">
+      </mat-progress-spinner>
+    </div>
+  </ng-template>
+
 </div>
 

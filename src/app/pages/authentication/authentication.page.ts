@@ -9,15 +9,15 @@ import { AuthenticationService } from '../../services/auth/authentication.servic
 })
 export class AuthenticationPageComponent {
 
-  loginInProgreess: Boolean = false;
+  loginInProgress: Boolean = false;
 
   constructor(private auth: AuthenticationService) {}
 
   login(): void {
-    this.loginInProgreess = true;
+    this.loginInProgress = true;
     this.auth.login()
       .then(() => {
-        this.loginInProgreess = false;
+        this.loginInProgress = false;
       });
   }
 }
