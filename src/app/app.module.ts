@@ -14,7 +14,8 @@ import { AuthenticationPageComponent } from './pages/authentication/authenticati
 import { ConversationsPageComponent } from './pages/conversations/conversations.page';
 import { ContactListComponent } from './reusables/contact-list/contact-list.component';
 import { environment } from '../environments/environment';
-import { ToolbarComponent } from './reusables/slk-toolbar/toolbar.component';
+import { ToolbarComponent } from './reusables/toolbar/toolbar.component';
+import { ConversationListItemComponent } from './reusables/conversation-list-item/conversation-list-item.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { ToolbarComponent } from './reusables/slk-toolbar/toolbar.component';
     AuthenticationPageComponent,
     ConversationsPageComponent,
     ContactListComponent,
-    ToolbarComponent
+    ToolbarComponent,
+    ConversationListItemComponent
   ],
   imports: [
     BrowserModule,

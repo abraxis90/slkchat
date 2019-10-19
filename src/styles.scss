@@ -59,6 +59,7 @@ table {
 /* endregion */
 
 /* region CUSTOM OVERRIDES */
+
 body, html {
   height: 100%;
 }
@@ -66,6 +67,18 @@ body, html {
 // respect material design guidelines by uppercasing all button text
 button {
   text-transform: uppercase;
+}
+
+/* endregion */
+
+/* region UTILITIES */
+
+.no-margin {
+  padding: 0 !important;
+}
+
+.no-padding {
+  padding: 0 !important;
 }
 
 /* endregion */
