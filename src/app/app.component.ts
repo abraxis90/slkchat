@@ -41,8 +41,4 @@ export class AppComponent {
     );
   }
 
-  // TODO: make dedicated toolbar component & move method
-  logout(): void {
-    this.auth.logout();
-  }
 }

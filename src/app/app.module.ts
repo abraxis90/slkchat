@@ -14,13 +14,15 @@ import { AuthenticationPageComponent } from './pages/authentication/authenticati
 import { ConversationsPageComponent } from './pages/conversations/conversations.page';
 import { ContactListComponent } from './reusables/contact-list/contact-list.component';
 import { environment } from '../environments/environment';
+import { ToolbarComponent } from './reusables/slk-toolbar/toolbar.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AuthenticationPageComponent,
     ConversationsPageComponent,
-    ContactListComponent
+    ContactListComponent,
+    ToolbarComponent
   ],
   imports: [
     BrowserModule,
