@@ -1,8 +1,12 @@
 <div class="chat-input-container" fxLayout="row" fxLayoutAlign="start center">
   <div class="chat-textarea-wrapper" fxFlex>
-    <textarea class="mat-body" placeholder="Write a new message"></textarea>
+    <textarea class="mat-body"
+              [(ngModel)]="messageBody"
+              (keydown.enter)="messageSubmit($event)"
+              placeholder="Write a new message"></textarea>
   </div>
   <button class="send-message-fab"
+          (click)="messageSubmit($event)"
           color="primary"
           mat-mini-fab
           aria-label="send message">

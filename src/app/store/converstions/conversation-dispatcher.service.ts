@@ -7,7 +7,7 @@ import { Conversation, CONVERSATIONS_PATH, MESSAGES_PATH } from './conversation'
 import { map } from 'rxjs/internal/operators';
 import { Store } from '@ngrx/store';
 import { ConversationLoadSuccess } from './conversation.actions';
-import { Message } from './message';
+import { FirebaseMessage, Message } from './message';
 import { AuthenticationService } from '../../services/auth/authentication.service';
 
 interface FirebaseConversation {
@@ -28,9 +28,13 @@ export class ConversationDispatcherService {
 
   constructor(private readonly afs: AngularFirestore,
               private auth: AuthenticationService,
-              private store: Store<{ conversations: Conversation[] }>) {
+              private store: Store<{ conversations: Conversation[] }>) {}
 
-    this.conversationCollection = this.afs.collection<FirebaseConversation>(CONVERSATIONS_PATH);
+  loadConversations() {
+    this.conversationCollection = this.afs.collection<FirebaseConversation>(
+      CONVERSATIONS_PATH,
+      ref => ref.where('users', 'array-contains', this.auth.state.value.uid)
+    );
 
     this.conversationUpsertedSubscription = this.conversationCollection.snapshotChanges(['added', 'modified'])
       .pipe(
@@ -62,22 +66,34 @@ export class ConversationDispatcherService {
   }
 
   loadCurrentMessageCollection(conversationUid: string): Observable<Message[]> {
-    this.currentMessageCollection = this.afs.collection<Message>(`${CONVERSATIONS_PATH}/${conversationUid}/${MESSAGES_PATH}`);
+    this.currentMessageCollection = this.afs.collection<Message>(
+      `${CONVERSATIONS_PATH}/${conversationUid}/${MESSAGES_PATH}`,
+      ref => ref.orderBy('sentAt')
+    );
     return this.currentMessageCollection.snapshotChanges(['added', 'modified'])
       .pipe(
         map((messageChangeActions: DocumentChangeAction<Message>[]) => {
           return messageChangeActions.map((messageChangeAction: DocumentChangeAction<Message>) => {
-            const messageData = messageChangeAction.payload.doc.data();
+            const messageData: Message = messageChangeAction.payload.doc.data();
             return new Message(
               messageChangeAction.payload.doc.id,
               conversationUid,
               messageData.body,
               messageData.from,
               undefined,
-              undefined);
+              messageData.sentAt);
           });
         })
       );
+  }
+
+  sendMessageToCurrentConversation(firebaseMessage: FirebaseMessage) {
+    if (!this.currentMessageCollection) {
+      return;
+    } else {
+      // @ts-ignore
+      this.currentMessageCollection.add(firebaseMessage);
+    }
   }
 
   dropCurrentMessageCollection() {

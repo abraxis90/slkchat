@@ -1,4 +1,9 @@
 .conversation-page {
   position: relative;
-  min-height: calc(100% - 56px);
+  margin-bottom: 80px;
+  min-height: calc(100% - 56px - 80px); // toolbar height + chat-input height
+
+  app-chat-input {
+    height: 80px;
+  }
 }

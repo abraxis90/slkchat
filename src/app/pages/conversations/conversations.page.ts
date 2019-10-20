@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable } from 'rxjs';
 import { first, map } from 'rxjs/internal/operators';
@@ -19,7 +19,7 @@ import { Router } from '@angular/router';
   templateUrl: './conversations.page.html',
   styleUrls: ['./conversations.page.scss'],
 })
-export class ConversationsPageComponent {
+export class ConversationsPageComponent implements OnInit {
   private conversations$: Observable<Conversation[]> = this.store.select(selectAllConversations);
   public users$: Observable<User[]> = this.store.select(selectAllUsers);
   public conversationsDrawable$: Observable<Conversation[]> =
@@ -40,7 +40,12 @@ export class ConversationsPageComponent {
     );
 
   constructor(private store: Store<{ users: User[], conversations: Conversation[] }>,
+              private conversationDispatcher: ConversationDispatcherService,
               private dialog: MatDialog) {
+  }
+
+  ngOnInit(): void {
+    this.conversationDispatcher.loadConversations();
   }
 
   createConversation() {

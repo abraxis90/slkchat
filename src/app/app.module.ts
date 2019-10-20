@@ -19,6 +19,7 @@ import { ConversationListItemComponent } from './reusables/conversation-list-ite
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { ConversationPageComponent } from './pages/conversation/conversation.page';
 import { ChatInputComponent } from './pages/conversation/components/chat-input/chat-input.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { ChatInputComponent } from './pages/conversation/components/chat-input/c
     AngularFirestoreModule,
     FlexLayoutModule,
     HttpClientModule,
+    FormsModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   entryComponents: [
