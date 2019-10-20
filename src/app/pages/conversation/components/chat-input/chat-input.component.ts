@@ -8,7 +8,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 })
 export class ChatInputComponent {
   @Output() messageSubmitted = new EventEmitter<string>();
-  private messageBody = '';
+  public messageBody = '';
 
   messageSubmit($event: Event) {
     // TODO: consider using form instead
