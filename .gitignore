@@ -4,6 +4,7 @@
 src/app/FIREBASE_CONFIG.ts
 .firebaserc
 firebase.json
+/.firebase
 
 # compiled output
 /dist
@@ -21,6 +22,7 @@ firebase.json
 *.launch
 .settings/
 *.sublime-workspace
+.editorconfig
 
 # IDE - VSCode
 .vscode/*
