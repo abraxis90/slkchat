@@ -1,5 +1,5 @@
 {
-  "name": "slkchat",
+  "name": "Sleek",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -22,7 +22,9 @@
     "@angular/material": "^8.0.0",
     "@angular/platform-browser": "~8.2.1",
     "@angular/platform-browser-dynamic": "~8.2.1",
+    "@angular/pwa": "^0.803.12",
     "@angular/router": "~8.2.1",
+    "@angular/service-worker": "~8.2.1",
     "@ngrx/effects": "^8.2.0",
     "@ngrx/entity": "^8.2.0",
     "@ngrx/store": "^8.2.0",

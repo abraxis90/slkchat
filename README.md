@@ -1,4 +1,4 @@
-# Slkchat
+# Sleek
 
 Simple chat application with authentication.
 

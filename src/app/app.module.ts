@@ -16,6 +16,7 @@ import { ContactListComponent } from './reusables/contact-list/contact-list.comp
 import { environment } from '../environments/environment';
 import { ToolbarComponent } from './reusables/toolbar/toolbar.component';
 import { ConversationListItemComponent } from './reusables/conversation-list-item/conversation-list-item.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { ConversationListItemComponent } from './reusables/conversation-list-ite
     AngularFireAuthModule,
     AngularFirestoreModule,
     FlexLayoutModule,
-    HttpClientModule
+    HttpClientModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   entryComponents: [
     ContactListComponent

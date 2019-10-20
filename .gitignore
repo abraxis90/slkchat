@@ -2,6 +2,8 @@
 
 # private resources
 src/app/FIREBASE_CONFIG.ts
+.firebaserc
+firebase.json
 
 # compiled output
 /dist

@@ -39,7 +39,7 @@ export class ConversationDispatcherService {
             const conversationChangeActionData = changeAction.payload.doc.data();
             const conversationUsers = conversationChangeActionData.users
             // filter out own user from conversation participants
-              .filter(userUid => userUid !== this.auth.state.value.uid)
+              .filter(userUid => this.auth.state.value ? userUid !== this.auth.state.value.uid : true)
               .map(userUid => {
                 return { uid: userUid };
               });

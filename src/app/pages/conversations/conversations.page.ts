@@ -1,18 +1,17 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable } from 'rxjs';
-import { map } from 'rxjs/internal/operators';
+import { first, map } from 'rxjs/internal/operators';
 
 
 import { Conversation } from '../../store/converstions/conversation';
 import { User } from '../../store/users/user';
-import { selectAllConversations } from '../../store/converstions/conversation.selector';
+import { selectAllConversations, selectConversationsByUserUids } from '../../store/converstions/conversation.selector';
 import { selectAllUsers } from '../../store/users/user.selector';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { ContactListComponent } from '../../reusables/contact-list/contact-list.component';
 import { ConversationAdd } from '../../store/converstions/conversation.actions';
 import { ConversationDispatcherService } from '../../store/converstions/conversation-dispatcher.service';
-import { AuthenticationService } from '../../services/auth/authentication.service';
 
 @Component({
   selector: 'app-conversations-page',
@@ -48,12 +47,25 @@ export class ConversationsPageComponent {
     const dialogRef: MatDialogRef<ContactListComponent> = this.dialog.open(ContactListComponent, {
       data: { users$: this.users$ }
     });
-    dialogRef.afterClosed().subscribe((selectedContacts: User[]) => {
-      if (selectedContacts !== undefined) {
-        const freshConversation = new Conversation(undefined, [], selectedContacts, undefined);
-        this.store.dispatch(new ConversationAdd(freshConversation));
-      }
-    });
+    dialogRef.afterClosed()
+      .pipe(first())
+      .subscribe((selectedContacts: User[]) => {
+        if (selectedContacts !== undefined) {
+          const selectedContactUids = selectedContacts.map(user => user.uid);
+          this.store.select(selectConversationsByUserUids(), selectedContactUids)
+            .pipe(first())
+            .subscribe(matchingConversations => {
+              if (matchingConversations.length) {
+                // TODO: open conversation
+              } else {
+                // create conversation if it doesn't exist
+                const freshConversation = new Conversation(undefined, [], selectedContacts, undefined);
+                this.store.dispatch(new ConversationAdd(freshConversation));
+              }
+            });
+
+        }
+      });
   }
 
   loadMessages(conversationUid: string) {

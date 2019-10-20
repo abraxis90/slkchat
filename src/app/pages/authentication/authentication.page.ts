@@ -11,7 +11,7 @@ export class AuthenticationPageComponent {
 
   loginInProgress: Boolean = false;
 
-  constructor(private auth: AuthenticationService) {}
+  constructor(public auth: AuthenticationService) {}
 
   login(): void {
     this.loginInProgress = true;
