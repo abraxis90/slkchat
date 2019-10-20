@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, DocumentChangeAction, DocumentReference } from '@angular/fire/firestore';
 
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 import { Conversation, CONVERSATIONS_PATH, MESSAGES_PATH } from './conversation';
 import { map } from 'rxjs/internal/operators';
@@ -61,9 +61,9 @@ export class ConversationDispatcherService {
     return this.conversationCollection.add(firebaseConversation);
   }
 
-  loadCurrentMessageCollection(conversationUid: string) {
+  loadCurrentMessageCollection(conversationUid: string): Observable<Message[]> {
     this.currentMessageCollection = this.afs.collection<Message>(`${CONVERSATIONS_PATH}/${conversationUid}/${MESSAGES_PATH}`);
-    this.currentMessageUpsertedSubscription = this.currentMessageCollection.snapshotChanges(['added', 'modified'])
+    return this.currentMessageCollection.snapshotChanges(['added', 'modified'])
       .pipe(
         map((messageChangeActions: DocumentChangeAction<Message>[]) => {
           return messageChangeActions.map((messageChangeAction: DocumentChangeAction<Message>) => {
@@ -77,10 +77,7 @@ export class ConversationDispatcherService {
               undefined);
           });
         })
-      )
-      .subscribe((test) => {
-        console.log(test);
-      });
+      );
   }
 
   dropCurrentMessageCollection() {

@@ -12,6 +12,7 @@ import { MatDialog, MatDialogRef } from '@angular/material';
 import { ContactListComponent } from '../../reusables/contact-list/contact-list.component';
 import { ConversationAdd } from '../../store/converstions/conversation.actions';
 import { ConversationDispatcherService } from '../../store/converstions/conversation-dispatcher.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-conversations-page',
@@ -39,8 +40,7 @@ export class ConversationsPageComponent {
     );
 
   constructor(private store: Store<{ users: User[], conversations: Conversation[] }>,
-              private dialog: MatDialog,
-              private conversationDispatcher: ConversationDispatcherService) {
+              private dialog: MatDialog) {
   }
 
   createConversation() {
@@ -66,10 +66,6 @@ export class ConversationsPageComponent {
 
         }
       });
-  }
-
-  loadMessages(conversationUid: string) {
-    this.conversationDispatcher.loadCurrentMessageCollection(conversationUid);
   }
 
   public trackByUid(index, conversation) {

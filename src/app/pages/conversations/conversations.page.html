@@ -2,7 +2,7 @@
   <mat-list *ngIf="(conversationsDrawable$ | async) as conversations"
             class="conversation-list">
     <mat-action-list *ngFor="let conversation of conversations; trackBy: trackByUid">
-      <app-conversation-list-item (click)="loadMessages(conversation.uid)"
+      <app-conversation-list-item [routerLink]="[conversation.uid]"
                                   [conversation]="conversation">
       </app-conversation-list-item>
     </mat-action-list>

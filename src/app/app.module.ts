@@ -17,15 +17,19 @@ import { environment } from '../environments/environment';
 import { ToolbarComponent } from './reusables/toolbar/toolbar.component';
 import { ConversationListItemComponent } from './reusables/conversation-list-item/conversation-list-item.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { ConversationPageComponent } from './pages/conversation/conversation.page';
+import { ChatInputComponent } from './pages/conversation/components/chat-input/chat-input.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     AuthenticationPageComponent,
     ConversationsPageComponent,
+    ConversationPageComponent,
     ContactListComponent,
     ToolbarComponent,
-    ConversationListItemComponent
+    ConversationListItemComponent,
+    ChatInputComponent
   ],
   imports: [
     BrowserModule,

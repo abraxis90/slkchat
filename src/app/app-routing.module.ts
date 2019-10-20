@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthenticationPageComponent } from './pages/authentication/authentication.page';
 import { ConversationsPageComponent } from './pages/conversations/conversations.page';
 import { IsAuthenticatedGuardService } from './services/auth/is-authenticated-guard.service';
+import { ConversationPageComponent } from './pages/conversation/conversation.page';
 
 const ROUTES: Routes = [
   {
@@ -17,8 +18,17 @@ const ROUTES: Routes = [
   },
   {
     path: 'conversations',
-    component: ConversationsPageComponent,
-    canActivate: [IsAuthenticatedGuardService]
+    canActivate: [IsAuthenticatedGuardService],
+    children: [
+      {
+        path: '',
+        component: ConversationsPageComponent
+      },
+      {
+        path: ':uid',
+        component: ConversationPageComponent
+      }
+    ]
   }
 ];
 

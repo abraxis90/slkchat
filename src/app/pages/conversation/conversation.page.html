@@ -1,0 +1,11 @@
+<div class="conversation-page" fxLayout="column" fxLayoutAlign="space-between start">
+  
+  <div *ngIf="(messages$ | async) as messages">
+    <p *ngFor="let message of messages ">
+      {{ message?.body }}
+    </p>
+  </div>
+  
+  <app-chat-input></app-chat-input>
+
+</div>

@@ -4,7 +4,7 @@ import {
   MatButtonModule,
   MatCardModule,
   MatDialogModule,
-  MatIconModule,
+  MatIconModule, MatInputModule,
   MatListModule,
   MatProgressSpinnerModule,
   MatToolbarModule
@@ -21,7 +21,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatCardModule,
     MatIconModule,
     MatDialogModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatInputModule
   ],
   exports: [
     BrowserAnimationsModule,
@@ -31,7 +32,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatCardModule,
     MatIconModule,
     MatDialogModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatInputModule
   ]
 })
 export class AMaterialModule {
