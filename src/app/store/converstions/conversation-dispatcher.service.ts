@@ -22,7 +22,7 @@ export class ConversationDispatcherService {
 
   private conversationCollection: AngularFirestoreCollection<FirebaseConversation>;
   private conversationUpsertedSubscription: Subscription;
-  private currentMessageCollection: AngularFirestoreCollection<Message>;
+  private currentMessageCollection: AngularFirestoreCollection<FirebaseMessage>;
   private currentMessageUpsertedSubscription: Subscription;
 
 
@@ -66,15 +66,15 @@ export class ConversationDispatcherService {
   }
 
   loadCurrentMessageCollection(conversationUid: string): Observable<Message[]> {
-    this.currentMessageCollection = this.afs.collection<Message>(
+    this.currentMessageCollection = this.afs.collection<FirebaseMessage>(
       `${CONVERSATIONS_PATH}/${conversationUid}/${MESSAGES_PATH}`,
       ref => ref.orderBy('sentAt')
     );
     return this.currentMessageCollection.snapshotChanges(['added', 'modified'])
       .pipe(
-        map((messageChangeActions: DocumentChangeAction<Message>[]) => {
-          return messageChangeActions.map((messageChangeAction: DocumentChangeAction<Message>) => {
-            const messageData: Message = messageChangeAction.payload.doc.data();
+        map((messageChangeActions: DocumentChangeAction<FirebaseMessage>[]) => {
+          return messageChangeActions.map((messageChangeAction: DocumentChangeAction<FirebaseMessage>) => {
+            const messageData: FirebaseMessage = messageChangeAction.payload.doc.data();
             return new Message(
               messageChangeAction.payload.doc.id,
               conversationUid,
@@ -87,12 +87,12 @@ export class ConversationDispatcherService {
       );
   }
 
-  sendMessageToCurrentConversation(firebaseMessage: FirebaseMessage) {
+  sendMessageToCurrentConversation(firebaseMessage: FirebaseMessage): Promise<null> {
     if (!this.currentMessageCollection) {
-      return;
+      return Promise.reject();
     } else {
-      // @ts-ignore
-      this.currentMessageCollection.add(firebaseMessage);
+      return this.currentMessageCollection.add(firebaseMessage)
+        .then(() => Promise.resolve(null));
     }
   }
 

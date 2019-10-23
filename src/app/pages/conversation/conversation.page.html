@@ -1,11 +1,14 @@
-<div class="conversation-page" fxLayout="column" fxLayoutAlign="space-between start">
+<div class="conversation-page" fxLayout="column" fxLayoutAlign="start start">
   
-  <div class="mat-body" *ngIf="(messages$ | async) as messages">
-    <p *ngFor="let message of messages ">
-      {{ message?.body }}
-    </p>
+  <div class="mat-body">
+    <div *ngIf="(messages$ | async) as messages">
+      <p *ngFor="let message of messages">
+        {{ message?.body }}
+      </p>
+    </div>
+    
   </div>
-  
+  <div #messagesEnd></div>
   <app-chat-input (messageSubmitted)="handleMessageSubmitted($event)"></app-chat-input>
 
 </div>
