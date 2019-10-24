@@ -3,11 +3,11 @@ import { AngularFirestore, AngularFirestoreCollection, DocumentChangeAction, Doc
 
 import { Observable } from 'rxjs';
 
-import { Conversation, CONVERSATIONS_PATH, MESSAGES_PATH } from './conversation';
+import { Conversation, CONVERSATIONS_PATH } from './conversation';
 import { map } from 'rxjs/internal/operators';
 import { Store } from '@ngrx/store';
 import { ConversationLoad } from './conversation.actions';
-import { FirebaseMessage, Message } from './message';
+import { FirebaseMessage, Message, MESSAGES_PATH } from '../messages/message';
 import { AuthenticationService } from '../../services/auth/authentication.service';
 
 interface FirebaseConversation {
@@ -52,7 +52,7 @@ export class ConversationDispatcherService {
               .map(userUid => {
                 return { uid: userUid };
               });
-            return new Conversation(changeAction.payload.doc.id, [], conversationUsers, undefined);
+            return new Conversation(changeAction.payload.doc.id, conversationUsers, undefined);
           });
         })
       );

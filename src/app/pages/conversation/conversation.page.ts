@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ConversationDispatcherService } from '../../store/converstions/conversation-dispatcher.service';
-import { FirebaseMessage, Message } from '../../store/converstions/message';
+import { FirebaseMessage, Message } from '../../store/messages/message';
 import { ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from '../../services/auth/authentication.service';
 import * as firebase from 'firebase';

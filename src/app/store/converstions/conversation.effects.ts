@@ -42,7 +42,7 @@ export class ConversationEffects {
         return from(this.conversationDispatcher.createConversation(action.payload)
           .then(conversationDocument => {
             // use conversationDocument id to get uid
-            return new Conversation(conversationDocument.id, [], action.payload.users, undefined);
+            return new Conversation(conversationDocument.id, action.payload.users, undefined);
           }));
       }),
       map((conversation: Conversation) => {
