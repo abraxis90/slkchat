@@ -1,10 +1,13 @@
-import { AfterViewInit, Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ConversationDispatcherService } from '../../store/converstions/conversation-dispatcher.service';
+import { ChatDispatcherService } from '../../store/chat-dispatcher.service';
 import { FirebaseMessage, Message } from '../../store/messages/message';
 import { ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from '../../services/auth/authentication.service';
 import * as firebase from 'firebase';
+import { Store } from '@ngrx/store';
+import { MessageActionTypes } from '../../store/messages/message.actions';
+import { selectAllMessages, selectMessagesLoading } from '../../store/messages/message.selector';
 
 const SCROLL_INTO_VIEW_OPTS: ScrollIntoViewOptions = { behavior: 'auto', block: 'start' };
 const SCROLL_INTO_VIEW_TIMEOUT = 50;
@@ -15,24 +18,29 @@ const SCROLL_INTO_VIEW_TIMEOUT = 50;
   styleUrls: ['./conversation.page.scss'],
 })
 export class ConversationPageComponent implements OnInit, AfterViewInit {
-  public messages$: Observable<Message[]>;
+  public messages$: Observable<Message[]> = this.store.select(selectAllMessages);
+  public messagesLoading$: Observable<boolean> = this.store.select(selectMessagesLoading);
   private conversationUid: string;
   @ViewChild('messagesEnd', { static: true }) messageEnd: ElementRef;
 
   constructor(private route: ActivatedRoute,
-              private conversationDispatcher: ConversationDispatcherService,
+              private conversationDispatcher: ChatDispatcherService,
               private auth: AuthenticationService,
-              private renderer: Renderer2) {
+              private store: Store<{ messages: Message[] }>) {
   }
 
   ngOnInit(): void {
     this.conversationUid = this.route.snapshot.paramMap.get('uid');
-    this.messages$ = this.conversationDispatcher.loadCurrentMessageCollection(this.conversationUid);
+    // TODO why not use constructor?
+    this.store.dispatch({ type: MessageActionTypes.MessagesLoad, payload: this.conversationUid });
   }
 
   ngAfterViewInit(): void {
-    // TODO: scroll only when loaded
-    this.scrollIntoView(this.messageEnd, undefined, 50);
+    this.messagesLoading$.subscribe((loading: boolean) => {
+      if (!loading) {
+        this.scrollIntoView(this.messageEnd, undefined, 0);
+      }
+    });
   }
 
   handleMessageSubmitted(messageBody) {

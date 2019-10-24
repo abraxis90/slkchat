@@ -3,12 +3,12 @@ import { AngularFirestore, AngularFirestoreCollection, DocumentChangeAction, Doc
 
 import { Observable } from 'rxjs';
 
-import { Conversation, CONVERSATIONS_PATH } from './conversation';
+import { Conversation, CONVERSATIONS_PATH } from './converstions/conversation';
 import { map } from 'rxjs/internal/operators';
 import { Store } from '@ngrx/store';
-import { ConversationLoad } from './conversation.actions';
-import { FirebaseMessage, Message, MESSAGES_PATH } from '../messages/message';
-import { AuthenticationService } from '../../services/auth/authentication.service';
+import { ConversationLoad } from './converstions/conversation.actions';
+import { FirebaseMessage, Message, MESSAGES_PATH } from './messages/message';
+import { AuthenticationService } from '../services/auth/authentication.service';
 
 interface FirebaseConversation {
   users: string[];
@@ -18,7 +18,7 @@ interface FirebaseConversation {
 @Injectable({
   providedIn: 'root'
 })
-export class ConversationDispatcherService {
+export class ChatDispatcherService {
 
   private conversationCollection: AngularFirestoreCollection<FirebaseConversation>;
   private currentMessageCollection: AngularFirestoreCollection<FirebaseMessage>;

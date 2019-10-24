@@ -12,7 +12,7 @@ import { selectAllConversations, selectConversationsByUserUids } from '../../sto
 import { selectAllUsers } from '../../store/users/user.selector';
 import { ContactListComponent } from '../../reusables/contact-list/contact-list.component';
 import { ConversationAdd } from '../../store/converstions/conversation.actions';
-import { ConversationDispatcherService } from '../../store/converstions/conversation-dispatcher.service';
+import { ChatDispatcherService } from '../../store/chat-dispatcher.service';
 
 @Component({
   selector: 'app-conversations-page',
@@ -40,7 +40,7 @@ export class ConversationsPageComponent implements OnInit {
     );
 
   constructor(private store: Store<{ users: User[], conversations: Conversation[] }>,
-              private conversationDispatcher: ConversationDispatcherService,
+              private conversationDispatcher: ChatDispatcherService,
               private router: Router,
               private route: ActivatedRoute,
               private dialog: MatDialog) {

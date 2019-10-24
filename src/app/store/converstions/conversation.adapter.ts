@@ -4,10 +4,5 @@ import { Conversation } from './conversation';
 
 export const ConversationAdapter: EntityAdapter<Conversation> =
   createEntityAdapter<Conversation>({
-    selectId: (conversation: Conversation) => conversation.uid,
-    sortComparer: sortByPublishedOn
+    selectId: (conversation: Conversation) => conversation.uid
   });
-
-function sortByPublishedOn(a: Conversation, b: Conversation): number {
-  return (b.lastSent) - (a.lastSent);
-}

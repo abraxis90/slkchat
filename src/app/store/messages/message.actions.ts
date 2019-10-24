@@ -8,7 +8,7 @@ export enum MessageActionTypes {
   MessageAddSuccess = 'conversation.add.success',
 }
 
-export type ConversationActions =
+export type MessageActions =
   MessagesLoad
   | MessagesLoadSuccess
   | MessagesAdd
@@ -17,6 +17,9 @@ export type ConversationActions =
 /* LOAD */
 export class MessagesLoad implements Action {
   readonly type = MessageActionTypes.MessagesLoad;
+
+  // load by conversationUid
+  constructor(public payload: string) {}
 }
 
 export class MessagesLoadSuccess implements Action {

@@ -1,14 +1,19 @@
 <div class="conversation-page" fxLayout="column" fxLayoutAlign="start start">
   
   <div class="mat-body">
+    <div *ngIf="messagesLoading$ | async" fxLayout="column" fxLayoutAlign="center center">
+      <mat-progress-spinner
+          color="accent"
+          mode="indeterminate">
+      </mat-progress-spinner>
+    </div>
     <div *ngIf="(messages$ | async) as messages">
       <p *ngFor="let message of messages">
         {{ message?.body }}
       </p>
     </div>
-    
+    <div #messagesEnd></div>
   </div>
-  <div #messagesEnd></div>
   <app-chat-input (messageSubmitted)="handleMessageSubmitted($event)"></app-chat-input>
 
 </div>
