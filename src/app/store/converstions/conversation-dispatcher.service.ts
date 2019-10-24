@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, DocumentChangeAction, DocumentReference } from '@angular/fire/firestore';
 
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { Conversation, CONVERSATIONS_PATH, MESSAGES_PATH } from './conversation';
 import { map } from 'rxjs/internal/operators';
 import { Store } from '@ngrx/store';
-import { ConversationLoadSuccess } from './conversation.actions';
+import { ConversationLoad } from './conversation.actions';
 import { FirebaseMessage, Message } from './message';
 import { AuthenticationService } from '../../services/auth/authentication.service';
 
@@ -21,22 +21,27 @@ interface FirebaseConversation {
 export class ConversationDispatcherService {
 
   private conversationCollection: AngularFirestoreCollection<FirebaseConversation>;
-  private conversationUpsertedSubscription: Subscription;
   private currentMessageCollection: AngularFirestoreCollection<FirebaseMessage>;
-  private currentMessageUpsertedSubscription: Subscription;
+  private upsertedConversations: Observable<Conversation[]>;
 
 
   constructor(private readonly afs: AngularFirestore,
               private auth: AuthenticationService,
               private store: Store<{ conversations: Conversation[] }>) {}
 
-  loadConversations() {
+  prepareListenToConversationUpserts(): void {
+    if (this.upsertedConversations === undefined) {
+      this.store.dispatch(new ConversationLoad());
+    }
+  }
+
+  listenToCoversationUpserts(): Observable<Conversation[]> {
     this.conversationCollection = this.afs.collection<FirebaseConversation>(
       CONVERSATIONS_PATH,
       ref => ref.where('users', 'array-contains', this.auth.state.value.uid)
     );
 
-    this.conversationUpsertedSubscription = this.conversationCollection.snapshotChanges(['added', 'modified'])
+    this.upsertedConversations = this.conversationCollection.snapshotChanges(['added', 'modified'])
       .pipe(
         map((conversationChangeActions: DocumentChangeAction<FirebaseConversation>[]) => {
           return conversationChangeActions.map((changeAction: DocumentChangeAction<FirebaseConversation>) => {
@@ -50,10 +55,9 @@ export class ConversationDispatcherService {
             return new Conversation(changeAction.payload.doc.id, [], conversationUsers, undefined);
           });
         })
-      )
-      .subscribe((conversations: Conversation[]) => {
-        this.store.dispatch(new ConversationLoadSuccess(conversations));
-      });
+      );
+
+    return this.upsertedConversations;
   }
 
   createConversation(conversation: Conversation): Promise<DocumentReference> {

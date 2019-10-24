@@ -3,7 +3,13 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { ConversationDispatcherService } from './conversation-dispatcher.service';
 import { UserDispatcherService } from '../users/user-dispatcher.service';
-import { ConversationActionTypes, ConversationAdd, ConversationAddSuccess } from './conversation.actions';
+import {
+  ConversationActionTypes,
+  ConversationAdd,
+  ConversationAddSuccess,
+  ConversationLoad,
+  ConversationLoadSuccess
+} from './conversation.actions';
 import { map, switchMap } from 'rxjs/operators';
 import { from } from 'rxjs';
 import { Conversation } from './conversation';
@@ -14,6 +20,18 @@ export class ConversationEffects {
   constructor(private actions$: Actions,
               private userDispatcher: UserDispatcherService,
               private conversationDispatcher: ConversationDispatcherService) {}
+
+  @Effect()
+  loadConversations = this.actions$
+    .pipe(
+      ofType(ConversationActionTypes.ConversationLoad as string),
+      switchMap((action: ConversationLoad) => {
+        return this.conversationDispatcher.listenToCoversationUpserts();
+      }),
+      map((conversations: Conversation[]) => {
+        return new ConversationLoadSuccess(conversations);
+      })
+    );
 
   @Effect()
   addConversation = this.actions$

@@ -12,7 +12,6 @@ import { MatDialog, MatDialogRef } from '@angular/material';
 import { ContactListComponent } from '../../reusables/contact-list/contact-list.component';
 import { ConversationAdd } from '../../store/converstions/conversation.actions';
 import { ConversationDispatcherService } from '../../store/converstions/conversation-dispatcher.service';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-conversations-page',
@@ -45,7 +44,7 @@ export class ConversationsPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.conversationDispatcher.loadConversations();
+    this.conversationDispatcher.prepareListenToConversationUpserts();
   }
 
   createConversation() {
