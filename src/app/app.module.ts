@@ -41,7 +41,7 @@ import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireAuthModule,
-    AngularFirestoreModule,
+    AngularFirestoreModule.enablePersistence(),
     FlexLayoutModule,
     HttpClientModule,
     FormsModule,
