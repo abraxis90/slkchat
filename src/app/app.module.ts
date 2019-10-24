@@ -20,6 +20,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 import { ConversationPageComponent } from './pages/conversation/conversation.page';
 import { ChatInputComponent } from './pages/conversation/components/chat-input/chat-input.component';
 import { FormsModule } from '@angular/forms';
+import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,7 @@ import { FormsModule } from '@angular/forms';
   entryComponents: [
     ContactListComponent
   ],
-  providers: [],
+  providers: [AngularFireAuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule {

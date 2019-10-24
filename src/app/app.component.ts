@@ -23,16 +23,7 @@ export class AppComponent {
               private domSanitizer: DomSanitizer) {
 
     // INIT
-    this.currentUser = auth.state.pipe(
-      tap(user => {
-        // redirect to appropriate routes
-        if (user !== null) {
-          this.router.navigate(['conversations']);
-        } else {
-          this.router.navigate(['login']);
-        }
-      })
-    );
+    this.currentUser = auth.state;
 
     this.matIconRegistry.addSvgIcon(
       `google_logo`,

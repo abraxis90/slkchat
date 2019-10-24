@@ -26,7 +26,10 @@ export class AuthenticationService {
   }
 
   logout(): void {
-    this.afAuth.auth.signOut();
+    this.afAuth.auth.signOut()
+      .then(() => {
+        this.router.navigate(['login']);
+      });
   }
 
   isLoggedIn(): Promise<boolean> {

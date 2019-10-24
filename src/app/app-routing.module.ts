@@ -3,8 +3,11 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AuthenticationPageComponent } from './pages/authentication/authentication.page';
 import { ConversationsPageComponent } from './pages/conversations/conversations.page';
-import { IsAuthenticatedGuardService } from './services/auth/is-authenticated-guard.service';
 import { ConversationPageComponent } from './pages/conversation/conversation.page';
+import { AngularFireAuthGuard, redirectLoggedInTo, redirectUnauthorizedTo } from '@angular/fire/auth-guard';
+
+const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
+const redirectLoggedInToItems = () => redirectLoggedInTo(['conversations']);
 
 const ROUTES: Routes = [
   {
@@ -14,11 +17,14 @@ const ROUTES: Routes = [
   },
   {
     path: 'login',
+    canActivate: [AngularFireAuthGuard],
+    data: { authGuardPipe: redirectLoggedInToItems },
     component: AuthenticationPageComponent
   },
   {
     path: 'conversations',
-    canActivate: [IsAuthenticatedGuardService],
+    canActivate: [AngularFireAuthGuard],
+    data: { authGuardPipe: redirectUnauthorizedToLogin },
     children: [
       {
         path: '',
