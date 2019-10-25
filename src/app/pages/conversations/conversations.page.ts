@@ -30,10 +30,12 @@ export class ConversationsPageComponent implements OnInit {
       map(([conversations, users]) => {
         return conversations
           .map((conversation: Conversation) => {
-            conversation.users = conversation.users
-              .map(user => {
-                return this.findUserInList(user.uid, users);
-              });
+            if (conversation.users && conversation.users.length) {
+              conversation.users = conversation.users
+                .map(user => {
+                  return this.findUserInList(user.uid, users);
+                });
+            }
             return conversation;
           });
       })

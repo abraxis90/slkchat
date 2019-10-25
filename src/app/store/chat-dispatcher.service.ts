@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, DocumentChangeAction, DocumentReference } from '@angular/fire/firestore';
-
-import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { map } from 'rxjs/internal/operators';
+import { Observable, Subject } from 'rxjs';
 
 import { Conversation, CONVERSATIONS_PATH } from './converstions/conversation';
-import { map } from 'rxjs/internal/operators';
-import { Store } from '@ngrx/store';
 import { ConversationLoad } from './converstions/conversation.actions';
 import { FirebaseMessage, Message, MESSAGES_PATH } from './messages/message';
 import { AuthenticationService } from '../services/auth/authentication.service';
@@ -22,7 +21,8 @@ export class ChatDispatcherService {
 
   private conversationCollection: AngularFirestoreCollection<FirebaseConversation>;
   private currentMessageCollection: AngularFirestoreCollection<FirebaseMessage>;
-  private upsertedConversations: Observable<Conversation[]>;
+  private upsertedConversations$: Observable<Conversation[]>;
+  public messageFromOtherUser$: Subject<boolean> = new Subject();
 
 
   constructor(private readonly afs: AngularFirestore,
@@ -30,7 +30,7 @@ export class ChatDispatcherService {
               private store: Store<{ conversations: Conversation[] }>) {}
 
   prepareListenToConversationUpserts(): void {
-    if (this.upsertedConversations === undefined) {
+    if (this.upsertedConversations$ === undefined) {
       this.store.dispatch(new ConversationLoad());
     }
   }
@@ -41,7 +41,7 @@ export class ChatDispatcherService {
       ref => ref.where('users', 'array-contains', this.auth.state.value.uid)
     );
 
-    this.upsertedConversations = this.conversationCollection.snapshotChanges(['added', 'modified'])
+    this.upsertedConversations$ = this.conversationCollection.snapshotChanges(['added', 'modified'])
       .pipe(
         map((conversationChangeActions: DocumentChangeAction<FirebaseConversation>[]) => {
           return conversationChangeActions.map((changeAction: DocumentChangeAction<FirebaseConversation>) => {
@@ -57,7 +57,7 @@ export class ChatDispatcherService {
         })
       );
 
-    return this.upsertedConversations;
+    return this.upsertedConversations$;
   }
 
   createConversation(conversation: Conversation): Promise<DocumentReference> {
@@ -91,12 +91,28 @@ export class ChatDispatcherService {
       );
   }
 
-  sendMessageToCurrentConversation(firebaseMessage: FirebaseMessage): Promise<null> {
+  sendMessageToCurrentConversation(firebaseMessage: FirebaseMessage): Promise<Message> {
     if (!this.currentMessageCollection) {
       return Promise.reject();
     } else {
       return this.currentMessageCollection.add(firebaseMessage)
-        .then(() => Promise.resolve(null));
+        .then((docRef: DocumentReference) => {
+          return docRef.get()
+            .then(messageSnapshot => {
+              const messageData = messageSnapshot.data();
+              return new Message(
+                messageSnapshot.id,
+                firebaseMessage.conversationUid,
+                messageData.body,
+                messageData.from,
+                undefined,
+                messageData.sentAt
+              );
+            });
+        })
+        .catch((reason) => {
+          return Promise.reject(reason);
+        });
     }
   }
 

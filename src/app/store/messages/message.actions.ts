@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-import { Message } from './message';
+import { FirebaseMessage, Message } from './message';
 
 export enum MessageActionTypes {
   MessagesLoad = 'messages.load',
@@ -11,8 +11,8 @@ export enum MessageActionTypes {
 export type MessageActions =
   MessagesLoad
   | MessagesLoadSuccess
-  | MessagesAdd
-  | MessaagesAddSuccess;
+  | MessageAdd
+  | MessageAddSuccess;
 
 /* LOAD */
 export class MessagesLoad implements Action {
@@ -30,14 +30,14 @@ export class MessagesLoadSuccess implements Action {
 }
 
 /* ADD */
-export class MessagesAdd implements Action {
+export class MessageAdd implements Action {
   readonly type = MessageActionTypes.MessageAdd;
 
-  constructor(public payload: Message) {
+  constructor(public payload: FirebaseMessage) {
   }
 }
 
-export class MessaagesAddSuccess implements Action {
+export class MessageAddSuccess implements Action {
   readonly type = MessageActionTypes.MessageAddSuccess;
 
   constructor(public payload: Message) {
