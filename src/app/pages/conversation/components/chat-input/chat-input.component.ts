@@ -9,11 +9,20 @@ import { Component, EventEmitter, Output } from '@angular/core';
 export class ChatInputComponent {
   @Output() messageSubmitted = new EventEmitter<string>();
   public messageBody = '';
+  public inputIsFocused = false;
 
-  messageSubmit($event: Event) {
+  handleMessageSubmit($event: Event) {
     // TODO: consider using form instead
     $event.preventDefault();
     this.messageSubmitted.emit(this.messageBody);
     this.messageBody = '';
+  }
+
+  handleInputFocus($event: Event) {
+    this.inputIsFocused = true;
+  }
+
+  handleInputBlur($event: Event) {
+    this.inputIsFocused = false;
   }
 }

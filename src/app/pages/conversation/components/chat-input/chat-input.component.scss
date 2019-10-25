@@ -33,9 +33,26 @@
     .send-message-fab {
       margin-left: 8px;
 
+      &.animate-with-fade-in {
+        animation-duration: 0.2s;
+        animation-fill-mode: both;
+        animation-name: fadeIn;
+      }
+
       mat-icon {
         transform: scale(0.8);
       }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
+        }
+      }
+
     }
   }
 }
