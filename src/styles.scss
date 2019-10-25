@@ -60,6 +60,11 @@ table {
 
 /* region CUSTOM OVERRIDES */
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 button {
   text-transform: uppercase; // respect material design guidelines by uppercasing all button text
 }

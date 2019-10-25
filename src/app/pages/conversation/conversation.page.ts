@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 import { ChatDispatcherService } from '../../store/chat-dispatcher.service';
 import { FirebaseMessage, Message } from '../../store/messages/message';
@@ -23,11 +23,14 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
   private conversationUid: string;
   private messageFromOtherUserSubscription: Subscription;
 
+  @ViewChild('conversationPage', { static: true }) conversationPage: ElementRef;
+  @ViewChild('messageList', { static: true }) messageList: ElementRef;
   @ViewChild('messagesEnd', { static: true }) messageEnd: ElementRef;
 
   constructor(private route: ActivatedRoute,
               private chatDispatcher: ChatDispatcherService,
               private auth: AuthenticationService,
+              private renderer: Renderer2,
               private store: Store<{ messages: Message[] }>) {
   }
 
@@ -44,7 +47,9 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
   ngAfterViewInit(): void {
     this.messagesLoading$.subscribe((loading: boolean) => {
       if (!loading) {
-        this.scrollIntoView(this.messageEnd, undefined, 0);
+        setTimeout(() => {
+          this.renderer.setProperty(this.conversationPage.nativeElement, 'scrollTop', this.messageList.nativeElement.offsetHeight);
+        }, 0);
       }
     });
   }
@@ -69,7 +74,11 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
     if (!isFromOtherUser) {
       this.scrollIntoView(this.messageEnd);
     } else {
-      //  decide whether to scroll based on scroll position
+      // TODO: have an objective way of determining when the user is scrolled enough away from the screen
+      if (this.messageList.nativeElement.offsetHeight - this.conversationPage.nativeElement.scrollTop < 1000) {
+        this.scrollIntoView(this.messageEnd);
+      } else {
+      }
     }
   }
 
