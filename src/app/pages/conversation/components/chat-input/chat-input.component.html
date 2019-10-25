@@ -3,6 +3,9 @@
     <textarea class="mat-body"
               [(ngModel)]="messageBody"
               (keydown.enter)="messageSubmit($event)"
+              cdkTextareaAutosize
+              cdkAutosizeMinRows="1"
+              cdkAutosizeMaxRows="5"
               placeholder="Write a new message"></textarea>
   </div>
   <button class="send-message-fab"
