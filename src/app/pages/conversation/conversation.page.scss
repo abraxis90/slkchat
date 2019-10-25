@@ -3,12 +3,15 @@
   overflow-y: auto;
   height: calc(100% - 64px); //subtract height of toolbar
 
-  app-chat-input {
-    min-height: 60px;
+  .message-list {
+    visibility: hidden;
+
+    &.visible {
+      visibility: visible;
+    }
   }
 
   @media (max-width: 599px) {
     height: calc(100% - 56px); //subtract height of toolbar
-
   }
 }

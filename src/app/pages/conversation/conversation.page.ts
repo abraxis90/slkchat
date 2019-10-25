@@ -20,6 +20,7 @@ const SCROLL_INTO_VIEW_TIMEOUT = 50;
 export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestroy {
   public messages$: Observable<Message[]> = this.store.select(selectAllMessages);
   public messagesLoading$: Observable<boolean> = this.store.select(selectMessagesLoading);
+  public chatVisible = false;
   private conversationUid: string;
   private messageFromOtherUserSubscription: Subscription;
 
@@ -49,6 +50,7 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
       if (!loading) {
         setTimeout(() => {
           this.renderer.setProperty(this.conversationPage.nativeElement, 'scrollTop', this.messageList.nativeElement.offsetHeight);
+          this.chatVisible = true;
         }, 0);
       }
     });
