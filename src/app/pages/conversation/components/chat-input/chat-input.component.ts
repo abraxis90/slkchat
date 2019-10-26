@@ -17,12 +17,4 @@ export class ChatInputComponent {
     this.messageSubmitted.emit(this.messageBody);
     this.messageBody = '';
   }
-
-  handleInputFocus($event: Event) {
-    this.inputIsFocused = true;
-  }
-
-  handleInputBlur($event: Event) {
-    this.inputIsFocused = false;
-  }
 }

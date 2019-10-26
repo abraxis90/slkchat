@@ -3,15 +3,13 @@
     <textarea class="mat-body"
               [(ngModel)]="messageBody"
               (keydown.enter)="handleMessageSubmit($event)"
-              (focus)="handleInputFocus($event)"
-              (blur)="handleInputBlur($event)"
               cdkTextareaAutosize
               cdkAutosizeMinRows="1"
               cdkAutosizeMaxRows="5"
               placeholder="Type your message..."></textarea>
   </div>
   <button class="send-message-fab animate-with-fade-in"
-          *ngIf="inputIsFocused"
+          *ngIf="messageBody.length"
           (click)="handleMessageSubmit($event)"
           color="primary"
           mat-mini-fab
