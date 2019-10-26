@@ -12,15 +12,16 @@ import { AMaterialModule } from './a-material.module';
 import { AppStoreModule } from './app-store.module';
 import { AuthenticationPageComponent } from './pages/authentication/authentication.page';
 import { ConversationsPageComponent } from './pages/conversations/conversations.page';
-import { ContactListComponent } from './reusables/contact-list/contact-list.component';
+import { ContactListComponent } from './reusables/components/contact-list/contact-list.component';
 import { environment } from '../environments/environment';
-import { ToolbarComponent } from './reusables/toolbar/toolbar.component';
-import { ConversationListItemComponent } from './reusables/conversation-list-item/conversation-list-item.component';
+import { ToolbarComponent } from './reusables/components/toolbar/toolbar.component';
+import { ConversationListItemComponent } from './reusables/components/conversation-list-item/conversation-list-item.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { ConversationPageComponent } from './pages/conversation/conversation.page';
 import { ChatInputComponent } from './pages/conversation/components/chat-input/chat-input.component';
 import { FormsModule } from '@angular/forms';
 import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
+import { AutofocusDirective } from './reusables/directives/auto-focus.directive';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
     ContactListComponent,
     ToolbarComponent,
     ConversationListItemComponent,
-    ChatInputComponent
+    ChatInputComponent,
+    AutofocusDirective
   ],
   imports: [
     BrowserModule,

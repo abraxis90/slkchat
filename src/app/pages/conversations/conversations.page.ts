@@ -10,7 +10,7 @@ import { Conversation } from '../../store/converstions/conversation';
 import { User } from '../../store/users/user';
 import { selectAllConversations, selectConversationsByUserUids } from '../../store/converstions/conversation.selector';
 import { selectAllUsers } from '../../store/users/user.selector';
-import { ContactListComponent } from '../../reusables/contact-list/contact-list.component';
+import { ContactListComponent } from '../../reusables/components/contact-list/contact-list.component';
 import { ConversationAdd } from '../../store/converstions/conversation.actions';
 import { ChatDispatcherService } from '../../store/chat-dispatcher.service';
 

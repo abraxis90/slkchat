@@ -2,7 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Observable } from 'rxjs';
 
-import { User } from '../../store/users/user';
+import { User } from '../../../store/users/user';
 
 interface ContactListData {
   users$: Observable<User[]>;

@@ -3,6 +3,7 @@
     <textarea class="mat-body"
               [(ngModel)]="messageBody"
               (keydown.enter)="handleMessageSubmit($event)"
+              appAutoFocus
               cdkTextareaAutosize
               cdkAutosizeMinRows="1"
               cdkAutosizeMaxRows="5"

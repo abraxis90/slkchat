@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { User } from 'firebase';
 
-import { AuthenticationService } from '../../services/auth/authentication.service';
+import { AuthenticationService } from '../../../services/auth/authentication.service';
 
 @Component({
   selector: 'app-toolbar',
