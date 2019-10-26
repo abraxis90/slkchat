@@ -26,7 +26,7 @@ export class ConversationEffects {
     .pipe(
       ofType(ConversationActionTypes.ConversationLoad as string),
       switchMap((action: ConversationLoad) => {
-        return this.conversationDispatcher.listenToCoversationUpserts();
+        return this.conversationDispatcher.listenToConversationUpserts();
       }),
       map((conversations: Conversation[]) => {
         return new ConversationLoadSuccess(conversations);

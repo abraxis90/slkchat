@@ -39,6 +39,7 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
     this.conversationUid = this.route.snapshot.paramMap.get('uid');
     // TODO why not use constructor?
     this.store.dispatch({ type: MessageActionTypes.MessagesLoad, payload: this.conversationUid });
+    this.store.dispatch({ type: MessageActionTypes.MessageUpsertsLoad, payload: this.conversationUid });
     this.messageFromOtherUserSubscription = this.chatDispatcher.messageFromOtherUser$
       .subscribe(isFromOtherUser => {
         this.handleMessageReceived(isFromOtherUser);

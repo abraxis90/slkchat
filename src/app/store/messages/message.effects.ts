@@ -1,19 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { map, switchMap, withLatestFrom } from 'rxjs/operators';
-import { from, Observable } from 'rxjs';
+import { first, map, switchMap, tap } from 'rxjs/operators';
+import { from } from 'rxjs';
 
 import { ChatDispatcherService } from '../chat-dispatcher.service';
-import { MessageActionTypes, MessageAdd, MessageAddSuccess, MessagesLoad, MessagesLoadSuccess } from './message.actions';
-import { selectMessagesLoading } from './message.selector';
+import { MessageActionTypes, MessageAdd, MessageAddSuccess, MessageNoop, MessagesLoad, MessagesLoadSuccess } from './message.actions';
 import { Message } from './message';
 import { AuthenticationService } from '../../services/auth/authentication.service';
 
 @Injectable()
 export class MessageEffects {
-
-  private messagesLoading$: Observable<boolean> = this.store.select(selectMessagesLoading);
 
   constructor(private actions$: Actions,
               private auth: AuthenticationService,
@@ -26,24 +23,25 @@ export class MessageEffects {
       ofType(MessageActionTypes.MessagesLoad as string),
       switchMap((action: MessagesLoad) => {
         const conversationUid = action.payload;
-        this.chatDispatcher.dropCurrentMessageCollection();
-        return this.chatDispatcher.loadCurrentMessageCollection(conversationUid);
+        this.chatDispatcher.dropCurrentMessages();
+        return this.chatDispatcher.loadCurrentMessageCollection(conversationUid).pipe(first());
       }),
-      withLatestFrom(this.messagesLoading$),
-      map(([messages, messagesLoading]) => {
-        if (messagesLoading) {
-          return new MessagesLoadSuccess(messages);
-        } else {
-          // TODO consider loading X messages & separately subscribing to a stream of only the last message
-          // only latest message
-          const message = messages[messages.length - 1];
-          if (message.from === this.auth.state.value.uid) {
-            this.chatDispatcher.messageFromOtherUser$.next(false);
-          } else {
-            this.chatDispatcher.messageFromOtherUser$.next(true);
-          }
-          return new MessageAddSuccess(message);
-        }
+      map((messages: Message[]) => {
+        return new MessagesLoadSuccess(messages);
+      })
+    );
+
+  @Effect()
+  loadMessageUpserts = this.actions$
+    .pipe(
+      ofType(MessageActionTypes.MessageUpsertsLoad as string),
+      switchMap((action: MessagesLoad) => {
+        const conversationUid = action.payload;
+        this.chatDispatcher.dropCurrentMessages();
+        return this.chatDispatcher.loadMessageUpserts(conversationUid);
+      }),
+      map((messages: Message[]) => {
+        return new MessageAddSuccess(messages);
       })
     );
 
@@ -54,8 +52,24 @@ export class MessageEffects {
       switchMap((action: MessageAdd) => {
         return from(this.chatDispatcher.sendMessageToCurrentConversation(action.payload));
       }),
-      map((message: Message) => {
-        return new MessageAddSuccess(message);
+      map(() => {
+        return new MessageNoop();
+      })
+    );
+
+  @Effect()
+  addMessageSuccess = this.actions$
+    .pipe(
+      ofType(MessageActionTypes.MessageAddSuccess as string),
+      tap((action: MessageAddSuccess) => {
+        if (action.payload[action.payload.length - 1].from === this.auth.state.value.uid) {
+          this.chatDispatcher.messageFromOtherUser$.next(false);
+        } else {
+          this.chatDispatcher.messageFromOtherUser$.next(true);
+        }
+      }),
+      map(() => {
+        return new MessageNoop();
       })
     );
 

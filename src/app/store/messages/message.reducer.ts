@@ -16,11 +16,14 @@ export function messageReducer(state = initialState,
     case MessageActionTypes.MessagesLoadSuccess:
       return MessageAdapter.addMany(action.payload, initialState);
 
+    case MessageActionTypes.MessageUpsertsLoad:
+      return state;
+
     case MessageActionTypes.MessageAdd:
       return state;
 
     case MessageActionTypes.MessageAddSuccess:
-      return MessageAdapter.addOne(action.payload, state);
+      return MessageAdapter.addMany(action.payload, state);
 
     default:
       return state;

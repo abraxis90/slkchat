@@ -1,16 +1,22 @@
 import { Action } from '@ngrx/store';
 import { FirebaseMessage, Message } from './message';
 
+export class MessageNoop implements Action {
+  readonly type = 'message.noop';
+}
+
 export enum MessageActionTypes {
   MessagesLoad = 'messages.load',
   MessagesLoadSuccess = 'messages.load.success',
+  MessageUpsertsLoad = 'messages.load.upserts',
   MessageAdd = 'message.add',
-  MessageAddSuccess = 'conversation.add.success',
+  MessageAddSuccess = 'message.add.success'
 }
 
 export type MessageActions =
   MessagesLoad
   | MessagesLoadSuccess
+  | MessageUpsertsLoad
   | MessageAdd
   | MessageAddSuccess;
 
@@ -29,6 +35,13 @@ export class MessagesLoadSuccess implements Action {
   }
 }
 
+export class MessageUpsertsLoad implements Action {
+  readonly type = MessageActionTypes.MessageUpsertsLoad;
+
+  constructor(public payload: Message[]) {
+  }
+}
+
 /* ADD */
 export class MessageAdd implements Action {
   readonly type = MessageActionTypes.MessageAdd;
@@ -40,6 +53,6 @@ export class MessageAdd implements Action {
 export class MessageAddSuccess implements Action {
   readonly type = MessageActionTypes.MessageAddSuccess;
 
-  constructor(public payload: Message) {
+  constructor(public payload: Message[]) {
   }
 }

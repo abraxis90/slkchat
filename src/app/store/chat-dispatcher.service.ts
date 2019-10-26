@@ -20,7 +20,10 @@ interface FirebaseConversation {
 export class ChatDispatcherService {
 
   private conversationCollection: AngularFirestoreCollection<FirebaseConversation>;
-  private currentMessageCollection: AngularFirestoreCollection<FirebaseMessage>;
+  private currentMessages: {
+    conversationUid: string,
+    collection: AngularFirestoreCollection<FirebaseMessage>
+  };
   private upsertedConversations$: Observable<Conversation[]>;
   public messageFromOtherUser$: Subject<boolean> = new Subject();
 
@@ -29,13 +32,15 @@ export class ChatDispatcherService {
               private auth: AuthenticationService,
               private store: Store<{ conversations: Conversation[] }>) {}
 
+  /* region CONVERSATIONS */
+
   prepareListenToConversationUpserts(): void {
     if (this.upsertedConversations$ === undefined) {
       this.store.dispatch(new ConversationLoad());
     }
   }
 
-  listenToCoversationUpserts(): Observable<Conversation[]> {
+  listenToConversationUpserts(): Observable<Conversation[]> {
     this.conversationCollection = this.afs.collection<FirebaseConversation>(
       CONVERSATIONS_PATH,
       ref => ref.where('users', 'array-contains', this.auth.state.value.uid)
@@ -69,12 +74,16 @@ export class ChatDispatcherService {
     return this.conversationCollection.add(firebaseConversation);
   }
 
+  /* endregion */
+
+  /* region MESSAGES */
+
   loadCurrentMessageCollection(conversationUid: string): Observable<Message[]> {
-    this.currentMessageCollection = this.afs.collection<FirebaseMessage>(
+    const loadedCollection = this.afs.collection<FirebaseMessage>(
       `${CONVERSATIONS_PATH}/${conversationUid}/${MESSAGES_PATH}`,
       ref => ref.orderBy('sentAt')
     );
-    return this.currentMessageCollection.snapshotChanges(['added', 'modified'])
+    return loadedCollection.snapshotChanges(['added', 'modified'])
       .pipe(
         map((messageChangeActions: DocumentChangeAction<FirebaseMessage>[]) => {
           return messageChangeActions.map((messageChangeAction: DocumentChangeAction<FirebaseMessage>) => {
@@ -91,11 +100,38 @@ export class ChatDispatcherService {
       );
   }
 
+  // TODO: investigate if the limit filter gets a fix
+  loadMessageUpserts(conversationUid: string): Observable<Message[]> {
+    this.currentMessages.collection = this.afs.collection<FirebaseMessage>(
+      `${CONVERSATIONS_PATH}/${conversationUid}/${MESSAGES_PATH}`,
+      ref => {
+        return ref.orderBy('sentAt');
+      }
+    );
+    this.currentMessages.conversationUid = conversationUid;
+    return this.currentMessages.collection.snapshotChanges(['added', 'modified'])
+      .pipe(
+        map((messageChangeActions: DocumentChangeAction<FirebaseMessage>[]) => {
+          const messages = messageChangeActions.map((messageChangeAction: DocumentChangeAction<FirebaseMessage>) => {
+            const messageData: FirebaseMessage = messageChangeAction.payload.doc.data();
+            return new Message(
+              messageChangeAction.payload.doc.id,
+              conversationUid,
+              messageData.body,
+              messageData.from,
+              undefined,
+              messageData.sentAt);
+          });
+          return messages;
+        })
+      );
+  }
+
   sendMessageToCurrentConversation(firebaseMessage: FirebaseMessage): Promise<Message> {
-    if (!this.currentMessageCollection) {
+    if (!this.currentMessages && !this.currentMessages.collection) {
       return Promise.reject();
     } else {
-      return this.currentMessageCollection.add(firebaseMessage)
+      return this.currentMessages.collection.add(firebaseMessage)
         .then((docRef: DocumentReference) => {
           return docRef.get()
             .then(messageSnapshot => {
@@ -116,8 +152,13 @@ export class ChatDispatcherService {
     }
   }
 
-  dropCurrentMessageCollection() {
-    this.currentMessageCollection = undefined;
+  dropCurrentMessages(): void {
+    this.currentMessages = {
+      collection: undefined,
+      conversationUid: undefined
+    };
   }
+
+  /* endregion */
 
 }
