@@ -4,10 +4,12 @@
   height: calc(100% - 64px); //subtract height of toolbar
 
   .message-list {
-    visibility: hidden;
+    padding: 0 16px;
+    opacity: 0;
+    transition: opacity 0.4s;
 
     &.visible {
-      visibility: visible;
+      opacity: 1;
     }
   }
 
