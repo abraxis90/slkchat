@@ -3,13 +3,11 @@ mat-toolbar {
   top: 0;
   z-index: 1000;
 
-  .logo {
-    width: 40px;
-    height: 40px;
+  .back-button {
     margin-right: 12px;
   }
 
-  button {
+  .sign-out {
     padding-left: 0;
     border-radius: 22px; /* user avatar + 2px to ensure no white space */
     .user-avatar {
