@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-import { ChatDispatcherService } from '../../store/chat-dispatcher.service';
+import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispatcher.service';
 import { FirebaseMessage, Message } from '../../store/messages/message';
 import { ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from '../../services/auth/authentication.service';

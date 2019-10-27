@@ -4,10 +4,10 @@ import { Store } from '@ngrx/store';
 import { map } from 'rxjs/internal/operators';
 import { Observable, Subject } from 'rxjs';
 
-import { Conversation, CONVERSATIONS_PATH } from './converstions/conversation';
-import { ConversationLoad } from './converstions/conversation.actions';
-import { FirebaseMessage, Message, MESSAGES_PATH } from './messages/message';
-import { AuthenticationService } from '../services/auth/authentication.service';
+import { Conversation, CONVERSATIONS_PATH } from '../../store/converstions/conversation';
+import { ConversationLoad } from '../../store/converstions/conversation.actions';
+import { FirebaseMessage, Message, MESSAGES_PATH } from '../../store/messages/message';
+import { AuthenticationService } from '../auth/authentication.service';
 
 interface FirebaseConversation {
   users: string[];

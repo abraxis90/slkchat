@@ -4,7 +4,7 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { first, map, switchMap, tap } from 'rxjs/operators';
 import { from } from 'rxjs';
 
-import { ChatDispatcherService } from '../chat-dispatcher.service';
+import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispatcher.service';
 import { MessageActionTypes, MessageAdd, MessageAddSuccess, MessageNoop, MessagesLoad, MessagesLoadSuccess } from './message.actions';
 import { Message } from './message';
 import { AuthenticationService } from '../../services/auth/authentication.service';

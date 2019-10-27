@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { ChatDispatcherService } from '../chat-dispatcher.service';
+import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispatcher.service';
 import { UserDispatcherService } from '../users/user-dispatcher.service';
 import {
   ConversationActionTypes,

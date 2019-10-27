@@ -12,7 +12,7 @@ import { selectAllConversations, selectConversationsByUserUids } from '../../sto
 import { selectAllUsers } from '../../store/users/user.selector';
 import { ContactListComponent } from '../../reusables/components/contact-list/contact-list.component';
 import { ConversationAdd } from '../../store/converstions/conversation.actions';
-import { ChatDispatcherService } from '../../store/chat-dispatcher.service';
+import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispatcher.service';
 
 @Component({
   selector: 'app-conversations-page',
