@@ -5,11 +5,17 @@
 
   .message-list {
     padding: 0 16px;
+    width: 100%;
+    box-sizing: border-box;
     opacity: 0;
     transition: opacity 0.2s;
 
     &.visible {
       opacity: 1;
+    }
+
+    app-chat-bubble {
+      margin: 8px 0;
     }
   }
 

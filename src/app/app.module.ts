@@ -14,14 +14,17 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { AMaterialModule } from './a-material.module';
 import { AppStoreModule } from './app-store.module';
+
 import { AuthenticationPageComponent } from './pages/authentication/authentication.page';
 import { ConversationsPageComponent } from './pages/conversations/conversations.page';
+import { ConversationPageComponent } from './pages/conversation/conversation.page';
+import { ChatInputComponent } from './pages/conversation/components/chat-input/chat-input.component';
+import { ChatBubbleComponent } from './pages/conversation/components/chat-bubble/chat-bubble.component';
 import { ContactListComponent } from './reusables/components/contact-list/contact-list.component';
 import { ToolbarComponent } from './reusables/components/toolbar/toolbar.component';
 import { ConversationListItemComponent } from './reusables/components/conversation-list-item/conversation-list-item.component';
-import { ConversationPageComponent } from './pages/conversation/conversation.page';
-import { ChatInputComponent } from './pages/conversation/components/chat-input/chat-input.component';
 import { AutofocusDirective } from './reusables/directives/auto-focus.directive';
+
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -34,6 +37,7 @@ import { environment } from '../environments/environment';
     ToolbarComponent,
     ConversationListItemComponent,
     ChatInputComponent,
+    ChatBubbleComponent,
     AutofocusDirective
   ],
   imports: [

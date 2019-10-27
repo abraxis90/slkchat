@@ -2,9 +2,7 @@
   
   <div class="message-list mat-body" [ngClass]="{'visible': chatVisible}" #messageList>
     <div *ngIf="(messages$ | async) as messages">
-      <p *ngFor="let message of messages">
-        {{ message?.body }}
-      </p>
+      <app-chat-bubble *ngFor="let message of messages" [message]="message"></app-chat-bubble>
     </div>
     <div #messagesEnd class="messages-end"></div>
   </div>
