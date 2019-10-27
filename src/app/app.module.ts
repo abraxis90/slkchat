@@ -5,7 +5,7 @@ import { AngularFireAuthModule } from '@angular/fire/auth';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AngularFireAuthGuard } from '@angular/fire/auth-guard';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { DeviceDetectorModule } from 'ngx-device-detector';
@@ -52,6 +52,7 @@ import { environment } from '../environments/environment';
     FlexLayoutModule,
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     DeviceDetectorModule.forRoot(),
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],

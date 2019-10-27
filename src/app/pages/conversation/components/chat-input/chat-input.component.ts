@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
+import { AbstractControl, FormControl, ValidatorFn } from '@angular/forms';
 
 
 @Component({
@@ -8,13 +9,20 @@ import { Component, EventEmitter, Output } from '@angular/core';
 })
 export class ChatInputComponent {
   @Output() messageSubmitted = new EventEmitter<string>();
-  public messageBody = '';
-  public inputIsFocused = false;
+  @ViewChild('chatInput', { static: true }) chatInput: ElementRef;
+  messageBody = new FormControl('', [this.minLengthNoWhitespace(0)]);
+
+  private minLengthNoWhitespace(length: number): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      const strippedString = control.value.replace(/\s/g, '');
+      return strippedString.length > length ? null : { 'minLengthNoWhitespace': { value: control.value } };
+    };
+  }
 
   handleMessageSubmit($event: Event) {
-    // TODO: consider using form instead
     $event.preventDefault();
-    this.messageSubmitted.emit(this.messageBody);
-    this.messageBody = '';
+    this.messageSubmitted.emit(this.messageBody.value);
+    this.messageBody.reset('');
+    this.chatInput.nativeElement.focus();
   }
 }

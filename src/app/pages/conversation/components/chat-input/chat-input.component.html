@@ -1,19 +1,23 @@
 <div class="chat-input-container" fxLayout="row" fxLayoutAlign="start center">
   <div class="chat-textarea-wrapper" fxFlex>
-    <textarea class="mat-body"
-              [(ngModel)]="messageBody"
-              (keydown.enter)="handleMessageSubmit($event)"
-              appAutoFocus
-              cdkTextareaAutosize
-              cdkAutosizeMinRows="1"
-              cdkAutosizeMaxRows="5"
-              placeholder="Type your message..."></textarea>
+    <form>
+      <textarea class="mat-body"
+                #chatInput
+                [formControl]="messageBody"
+                name="messageBody"
+                appAutoFocus
+                cdkTextareaAutosize
+                cdkAutosizeMinRows="1"
+                cdkAutosizeMaxRows="5"
+                placeholder="Type your message...">
+      </textarea>
+    </form>
   </div>
-  <button class="send-message-fab animate-with-fade-in"
-          *ngIf="messageBody.length"
+  <button class="send-message-button"
+          *ngIf="!messageBody.pristine && messageBody.valid"
           (click)="handleMessageSubmit($event)"
           color="primary"
-          mat-mini-fab
+          mat-icon-button
           aria-label="send message">
     <mat-icon>send</mat-icon>
   </button>

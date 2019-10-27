@@ -5,7 +5,7 @@
   right: 0;
   bottom: 0;
   left: 0;
-  padding: 4px 16px;
+  padding: 8px 16px;
   width: 100%;
   box-sizing: border-box;
   background: #ffffff;
@@ -30,27 +30,11 @@
       }
     }
 
-    .send-message-fab {
+    .send-message-button {
       margin-left: 8px;
-
-      &.animate-with-fade-in {
-        animation-duration: 0.2s;
-        animation-fill-mode: both;
-        animation-name: fadeIn;
-      }
 
       mat-icon {
         transform: scale(0.8);
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-
-        to {
-          opacity: 1;
-        }
       }
 
     }
