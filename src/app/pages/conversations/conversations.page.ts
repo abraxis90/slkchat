@@ -51,6 +51,7 @@ export class ConversationsPageComponent implements OnInit {
   ngOnInit(): void {
     // let the dispatcher decide whether a subscription needs to be made
     this.conversationDispatcher.prepareListenToConversationUpserts();
+    this.conversationDispatcher.dropCurrentMessages();
   }
 
   createConversation() {

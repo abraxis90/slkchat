@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { first, map, switchMap, tap } from 'rxjs/operators';
+import { first, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { from } from 'rxjs';
 
 import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispatcher.service';
@@ -22,9 +22,7 @@ export class MessageEffects {
     .pipe(
       ofType(MessageActionTypes.MessagesLoad as string),
       switchMap((action: MessagesLoad) => {
-        const conversationUid = action.payload;
-        this.chatDispatcher.dropCurrentMessages();
-        return this.chatDispatcher.loadCurrentMessageCollection(conversationUid).pipe(first());
+        return this.chatDispatcher.loadCurrentMessageCollection(action.payload).pipe(first());
       }),
       map((messages: Message[]) => {
         return new MessagesLoadSuccess(messages);
@@ -36,9 +34,8 @@ export class MessageEffects {
     .pipe(
       ofType(MessageActionTypes.MessageUpsertsLoad as string),
       switchMap((action: MessagesLoad) => {
-        const conversationUid = action.payload;
-        this.chatDispatcher.dropCurrentMessages();
-        return this.chatDispatcher.loadMessageUpserts(conversationUid);
+        return this.chatDispatcher.loadMessageUpserts(action.payload)
+          .pipe(takeUntil(this.chatDispatcher.closeCurrentMessages$));
       }),
       map((messages: Message[]) => {
         return new MessageAddSuccess(messages);
@@ -65,6 +62,8 @@ export class MessageEffects {
         if (action.payload[action.payload.length - 1].from === this.auth.state.value.uid) {
           this.chatDispatcher.messageFromOtherUser$.next(false);
         } else {
+          // experimental vibrate; remove if inconvenient
+          window.navigator.vibrate(200);
           this.chatDispatcher.messageFromOtherUser$.next(true);
         }
       }),

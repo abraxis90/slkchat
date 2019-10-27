@@ -22,7 +22,7 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
   public messagesLoading$: Observable<boolean> = this.store.select(selectMessagesLoading);
   public chatVisible = false;
   private conversationUid: string;
-  private messageFromOtherUserSubscription: Subscription;
+  private subscriptions: Subscription[] = [];
 
   @ViewChild('conversationPage', { static: true }) conversationPage: ElementRef;
   @ViewChild('messageList', { static: true }) messageList: ElementRef;
@@ -40,25 +40,29 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
     // TODO why not use constructor?
     this.store.dispatch({ type: MessageActionTypes.MessagesLoad, payload: this.conversationUid });
     this.store.dispatch({ type: MessageActionTypes.MessageUpsertsLoad, payload: this.conversationUid });
-    this.messageFromOtherUserSubscription = this.chatDispatcher.messageFromOtherUser$
-      .subscribe(isFromOtherUser => {
-        this.handleMessageReceived(isFromOtherUser);
-      });
+    this.subscriptions.push(
+      this.chatDispatcher.messageFromOtherUser$
+        .subscribe(isFromOtherUser => {
+          this.handleMessageReceived(isFromOtherUser);
+        }));
   }
 
   ngAfterViewInit(): void {
-    this.messagesLoading$.subscribe((loading: boolean) => {
-      if (!loading) {
-        setTimeout(() => {
-          this.renderer.setProperty(this.conversationPage.nativeElement, 'scrollTop', this.messageList.nativeElement.offsetHeight);
-          this.chatVisible = true;
-        }, 0);
-      }
-    });
+    this.subscriptions.push(
+      this.messagesLoading$
+        .subscribe((loading: boolean) => {
+          if (!loading) {
+            setTimeout(() => {
+              this.renderer.setProperty(this.conversationPage.nativeElement, 'scrollTop', this.messageList.nativeElement.offsetHeight);
+              this.chatVisible = true;
+            }, 0);
+          }
+        })
+    );
   }
 
   ngOnDestroy(): void {
-    this.messageFromOtherUserSubscription.unsubscribe();
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
   /* region API */
@@ -80,7 +84,6 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
       // TODO: have an objective way of determining when the user is scrolled enough away from the screen
       if (this.messageList.nativeElement.offsetHeight - this.conversationPage.nativeElement.scrollTop < 1000) {
         this.scrollIntoView(this.messageEnd);
-      } else {
       }
     }
   }

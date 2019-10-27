@@ -25,12 +25,15 @@ export class ChatDispatcherService {
     collection: AngularFirestoreCollection<FirebaseMessage>
   };
   private upsertedConversations$: Observable<Conversation[]>;
-  public messageFromOtherUser$: Subject<boolean> = new Subject();
+  public closeCurrentMessages$: Subject<null> = new Subject<null>();
+  public messageFromOtherUser$: Subject<boolean> = new Subject<boolean>();
 
 
   constructor(private readonly afs: AngularFirestore,
               private auth: AuthenticationService,
-              private store: Store<{ conversations: Conversation[] }>) {}
+              private store: Store<{ conversations: Conversation[] }>) {
+    this.initCurrentMessages();
+  }
 
   /* region CONVERSATIONS */
 
@@ -153,9 +156,14 @@ export class ChatDispatcherService {
   }
 
   dropCurrentMessages(): void {
+    this.initCurrentMessages();
+    this.closeCurrentMessages$.next(null);
+  }
+
+  private initCurrentMessages(): void {
     this.currentMessages = {
-      collection: undefined,
-      conversationUid: undefined
+      conversationUid: undefined,
+      collection: undefined
     };
   }
 
