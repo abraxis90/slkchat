@@ -42,7 +42,7 @@ export class ConversationsPageComponent implements OnInit {
     );
 
   constructor(private store: Store<{ users: User[], conversations: Conversation[] }>,
-              private conversationDispatcher: ChatDispatcherService,
+              private chatDispatcher: ChatDispatcherService,
               private router: Router,
               private route: ActivatedRoute,
               private dialog: MatDialog) {
@@ -50,8 +50,7 @@ export class ConversationsPageComponent implements OnInit {
 
   ngOnInit(): void {
     // let the dispatcher decide whether a subscription needs to be made
-    this.conversationDispatcher.prepareListenToConversationUpserts();
-    this.conversationDispatcher.dropCurrentMessages();
+    this.chatDispatcher.prepareListenToConversationUpserts();
   }
 
   createConversation() {

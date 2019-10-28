@@ -62,8 +62,6 @@ export class MessageEffects {
         if (action.payload[action.payload.length - 1].from === this.auth.state.value.uid) {
           this.chatDispatcher.messageFromOtherUser$.next(false);
         } else {
-          // experimental vibrate; remove if inconvenient
-          window.navigator.vibrate(200);
           this.chatDispatcher.messageFromOtherUser$.next(true);
         }
       }),

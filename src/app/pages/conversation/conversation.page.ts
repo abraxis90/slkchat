@@ -63,6 +63,7 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.chatDispatcher.dropCurrentMessages();
   }
 
   /* region API */
@@ -84,6 +85,9 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
       // TODO: have an objective way of determining when the user is scrolled enough away from the screen
       if (this.messageList.nativeElement.offsetHeight - this.conversationPage.nativeElement.scrollTop < 1000) {
         this.scrollIntoView(this.messageEnd);
+      } else {
+        // experimental vibrate; remove if inconvenient
+        window.navigator.vibrate(200);
       }
     }
   }
