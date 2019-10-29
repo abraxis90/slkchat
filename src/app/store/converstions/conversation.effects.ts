@@ -39,14 +39,10 @@ export class ConversationEffects {
       ofType(ConversationActionTypes.ConversationAdd as string),
       switchMap((action: ConversationAdd) => {
         // add conversation to firebase & convert returned promise to Observable
-        return from(this.conversationDispatcher.createConversation(action.payload)
-          .then(conversationDocument => {
-            // use conversationDocument id to get uid
-            return new Conversation(conversationDocument.id, action.payload.users, undefined);
-          }));
+        return from(this.conversationDispatcher.createConversation(action.payload));
       }),
-      map((conversation: Conversation) => {
-        return new ConversationAddSuccess(conversation);
+      map(() => {
+        return new ConversationAddSuccess();
       })
     );
 }

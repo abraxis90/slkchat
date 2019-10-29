@@ -19,7 +19,7 @@ export function conversationReducer(state = initialState,
       return state;
 
     case ConversationActionTypes.ConversationAddSuccess:
-      return ConversationAdapter.addOne(action.payload, state);
+      return state;
 
     case ConversationActionTypes.ConversationMessageSend:
       return state;

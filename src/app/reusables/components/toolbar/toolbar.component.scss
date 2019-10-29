@@ -7,13 +7,9 @@ mat-toolbar {
     margin-right: 12px;
   }
 
-  .sign-out {
-    padding-left: 0;
-    border-radius: 22px; /* user avatar + 2px to ensure no white space */
-    .user-avatar {
-      margin-right: 12px;
-      border-radius: 20px;
-    }
+  .user-avatar {
+    margin-right: 12px;
+    border-radius: 20px;
   }
 
 }

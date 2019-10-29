@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, DocumentChangeAction, DocumentReference } from '@angular/fire/firestore';
 import { Store } from '@ngrx/store';
-import { map } from 'rxjs/internal/operators';
-import { Observable, Subject } from 'rxjs';
+import { map, tap, withLatestFrom } from 'rxjs/internal/operators';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 import { Conversation, CONVERSATIONS_PATH } from '../../store/converstions/conversation';
 import { ConversationLoad } from '../../store/converstions/conversation.actions';
 import { FirebaseMessage, Message, MESSAGES_PATH } from '../../store/messages/message';
 import { AuthenticationService } from '../auth/authentication.service';
+import { User } from '../../store/users/user';
+import { selectAllUsers } from '../../store/users/user.selector';
+import { selectConversationByUid } from '../../store/converstions/conversation.selector';
 
 interface FirebaseConversation {
   users: string[];
@@ -20,13 +23,15 @@ interface FirebaseConversation {
 export class ChatDispatcherService {
 
   private conversationCollection: AngularFirestoreCollection<FirebaseConversation>;
+  private upsertedConversations$: Observable<Conversation[]>;
   private currentMessages: {
     conversationUid: string,
     collection: AngularFirestoreCollection<FirebaseMessage>
   };
-  private upsertedConversations$: Observable<Conversation[]>;
-  public closeCurrentMessages$: Subject<null> = new Subject<null>();
+  public closeCurrentMessages$: Subject<undefined> = new Subject<undefined>();
   public messageFromOtherUser$: Subject<boolean> = new Subject<boolean>();
+  public currentConversationUid$: BehaviorSubject<string | undefined> = new BehaviorSubject<string | undefined>(undefined);
+  users$: Observable<User[]> = this.store.select(selectAllUsers);
 
 
   constructor(private readonly afs: AngularFirestore,
@@ -51,16 +56,17 @@ export class ChatDispatcherService {
 
     this.upsertedConversations$ = this.conversationCollection.snapshotChanges(['added', 'modified'])
       .pipe(
-        map((conversationChangeActions: DocumentChangeAction<FirebaseConversation>[]) => {
+        withLatestFrom(this.users$),
+        map(([conversationChangeActions, users]) => {
           return conversationChangeActions.map((changeAction: DocumentChangeAction<FirebaseConversation>) => {
             const conversationChangeActionData = changeAction.payload.doc.data();
             const conversationUsers = conversationChangeActionData.users
             // filter out own user from conversation participants
               .filter(userUid => this.auth.state.value ? userUid !== this.auth.state.value.uid : true)
               .map(userUid => {
-                return { uid: userUid };
+                return this.findUserInList(userUid, users);
               });
-            return new Conversation(changeAction.payload.doc.id, conversationUsers, undefined);
+            return new Conversation(changeAction.payload.doc.id, conversationUsers);
           });
         })
       );
@@ -68,13 +74,16 @@ export class ChatDispatcherService {
     return this.upsertedConversations$;
   }
 
-  createConversation(conversation: Conversation): Promise<DocumentReference> {
+  createConversation(conversation: FirebaseConversation): Promise<DocumentReference> {
     const firebaseConversation = {
       users: conversation.users
-        .map(user => user.uid)
         .concat(this.auth.state.value.uid)
     };
     return this.conversationCollection.add(firebaseConversation);
+  }
+
+  private findUserInList(uid: string, users: User[]): User {
+    return users.find(user => user.uid === uid);
   }
 
   /* endregion */
@@ -99,6 +108,9 @@ export class ChatDispatcherService {
               undefined,
               messageData.sentAt);
           });
+        }),
+        tap(() => {
+          this.currentConversationUid$.next(conversationUid);
         })
       );
   }
@@ -165,6 +177,7 @@ export class ChatDispatcherService {
       conversationUid: undefined,
       collection: undefined
     };
+    this.currentConversationUid$.next(undefined);
   }
 
   /* endregion */

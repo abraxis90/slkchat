@@ -10,7 +10,7 @@ import { UserLoadSuccess } from './user.actions';
 import { AuthenticationService } from '../../services/auth/authentication.service';
 
 // TODO: refactor firebase function to use proper User Type
-interface FirebaseUser {
+export interface FirebaseUser {
   email: string;
   displayName: string;
   photoURL: string;

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { Store } from '@ngrx/store';
@@ -6,7 +6,7 @@ import { combineLatest, Observable } from 'rxjs';
 import { first, map } from 'rxjs/internal/operators';
 
 
-import { Conversation } from '../../store/converstions/conversation';
+import { Conversation, FirebaseConversation } from '../../store/converstions/conversation';
 import { User } from '../../store/users/user';
 import { selectAllConversations, selectConversationsByUserUids } from '../../store/converstions/conversation.selector';
 import { selectAllUsers } from '../../store/users/user.selector';
@@ -19,7 +19,7 @@ import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispa
   templateUrl: './conversations.page.html',
   styleUrls: ['./conversations.page.scss'],
 })
-export class ConversationsPageComponent implements OnInit {
+export class ConversationsPageComponent {
   private conversations$: Observable<Conversation[]> = this.store.select(selectAllConversations);
   public users$: Observable<User[]> = this.store.select(selectAllUsers);
   public conversationsDrawable$: Observable<Conversation[]> =
@@ -48,12 +48,7 @@ export class ConversationsPageComponent implements OnInit {
               private dialog: MatDialog) {
   }
 
-  ngOnInit(): void {
-    // let the dispatcher decide whether a subscription needs to be made
-    this.chatDispatcher.prepareListenToConversationUpserts();
-  }
-
-  createConversation() {
+  createConversation(): void {
     const dialogRef: MatDialogRef<ContactListComponent> = this.dialog.open(ContactListComponent, {
       data: { users$: this.users$ }
     });
@@ -69,7 +64,7 @@ export class ConversationsPageComponent implements OnInit {
                 this.navigateToConversationByUid(matchingConversations[0].uid);
               } else {
                 // create conversation if it doesn't exist
-                const freshConversation = new Conversation(undefined, selectedContacts, undefined);
+                const freshConversation = { users: selectedContacts.map(user => user.uid) } as FirebaseConversation;
                 this.store.dispatch(new ConversationAdd(freshConversation));
               }
             });

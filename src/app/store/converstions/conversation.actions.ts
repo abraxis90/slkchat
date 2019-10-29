@@ -1,6 +1,6 @@
 import { Action } from '@ngrx/store';
 
-import { Conversation } from './conversation';
+import { Conversation, FirebaseConversation } from './conversation';
 import { Message } from '../messages/message';
 
 export enum ConversationActionTypes {
@@ -36,15 +36,12 @@ export class ConversationLoadSuccess implements Action {
 export class ConversationAdd implements Action {
   readonly type = ConversationActionTypes.ConversationAdd;
 
-  constructor(public payload: Conversation) {
+  constructor(public payload: FirebaseConversation) {
   }
 }
 
 export class ConversationAddSuccess implements Action {
   readonly type = ConversationActionTypes.ConversationAddSuccess;
-
-  constructor(public payload: Conversation) {
-  }
 }
 
 /* MESSAGE SEND */
