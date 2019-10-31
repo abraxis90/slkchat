@@ -1,6 +1,5 @@
 import { MessageReceipt } from './message-receipt';
-import * as firebase from 'firebase';
-import Timestamp = firebase.firestore.Timestamp;
+import { firestore } from 'firebase/app';
 
 export const MESSAGES_PATH = 'MESSAGES';
 
@@ -8,7 +7,7 @@ export interface FirebaseMessage {
   conversationUid: string;
   body: string;
   from: string;
-  sentAt: Timestamp;
+  sentAt: firestore.Timestamp;
 }
 
 export class Message {
@@ -18,6 +17,6 @@ export class Message {
               public body: string,
               public from: string,
               public received?: MessageReceipt[],
-              public sentAt?: Timestamp) {
+              public sentAt?: firestore.Timestamp) {
   }
 }

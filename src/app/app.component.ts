@@ -2,12 +2,12 @@ import { Component } from '@angular/core';
 import { MatIconRegistry } from '@angular/material';
 import { Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
-import { User } from 'firebase';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import { AuthenticationService } from './services/auth/authentication.service';
 import { ChatDispatcherService } from './services/chat-dispatcher/chat-dispatcher.service';
+import { FirebaseUser } from './store/users/user';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +16,7 @@ import { ChatDispatcherService } from './services/chat-dispatcher/chat-dispatche
 })
 export class AppComponent {
 
-  public currentUser: Observable<User | null>;
+  public currentUser: Observable<FirebaseUser | null>;
 
   constructor(private auth: AuthenticationService,
               private router: Router,

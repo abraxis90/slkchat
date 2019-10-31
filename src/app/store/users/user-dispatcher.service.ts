@@ -4,17 +4,10 @@ import { AngularFirestore, AngularFirestoreCollection, DocumentChangeAction } fr
 import { Subscription } from 'rxjs';
 import { Store } from '@ngrx/store';
 
-import { User } from './user';
+import { FirebaseUser, User } from './user';
 import { filter, map } from 'rxjs/internal/operators';
 import { UserLoadSuccess } from './user.actions';
 import { AuthenticationService } from '../../services/auth/authentication.service';
-
-// TODO: refactor firebase function to use proper User Type
-export interface FirebaseUser {
-  email: string;
-  displayName: string;
-  photoURL: string;
-}
 
 @Injectable({
   providedIn: 'root'

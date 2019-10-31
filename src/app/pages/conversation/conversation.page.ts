@@ -4,7 +4,7 @@ import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispa
 import { FirebaseMessage, Message } from '../../store/messages/message';
 import { ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from '../../services/auth/authentication.service';
-import * as firebase from 'firebase';
+import { firestore } from 'firebase/app';
 import { Store } from '@ngrx/store';
 import { MessageActionTypes, MessageAdd } from '../../store/messages/message.actions';
 import { selectAllMessages, selectMessagesLoading } from '../../store/messages/message.selector';
@@ -73,7 +73,7 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
       conversationUid: this.conversationUid,
       body: messageBody,
       from: this.auth.state.value.uid,
-      sentAt: firebase.firestore.Timestamp.fromDate(new Date())
+      sentAt: firestore.Timestamp.fromDate(new Date())
     };
     this.store.dispatch(new MessageAdd(firebaseMessage));
   }

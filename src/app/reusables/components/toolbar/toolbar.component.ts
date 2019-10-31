@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { User } from 'firebase';
 import { Observable } from 'rxjs';
 
 import { AuthenticationService } from '../../../services/auth/authentication.service';
@@ -8,6 +7,7 @@ import { Conversation } from '../../../store/converstions/conversation';
 import { ChatDispatcherService } from '../../../services/chat-dispatcher/chat-dispatcher.service';
 import { Store } from '@ngrx/store';
 import { selectConversationByUid } from '../../../store/converstions/conversation.selector';
+import { FirebaseUser } from '../../../store/users/user';
 
 @Component({
   selector: 'app-toolbar',
@@ -16,7 +16,7 @@ import { selectConversationByUid } from '../../../store/converstions/conversatio
 })
 export class ToolbarComponent implements OnInit {
 
-  @Input() currentUser: User;
+  @Input() currentUser: FirebaseUser;
   public currentConversation$: Observable<Conversation>;
 
   constructor(private auth: AuthenticationService,
