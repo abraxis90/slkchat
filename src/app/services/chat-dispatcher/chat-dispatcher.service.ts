@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection, DocumentChangeAction, DocumentReference } from '@angular/fire/firestore';
 import { Store } from '@ngrx/store';
-import { map, switchMap, takeUntil, tap, withLatestFrom } from 'rxjs/internal/operators';
+import { map, switchMap, takeUntil, tap } from 'rxjs/internal/operators';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { DateTime } from 'luxon';
 
 import { Conversation, CONVERSATIONS_PATH, FirebaseConversation } from '../../store/converstions/conversation';
-import { ConversationLoad } from '../../store/converstions/conversation.actions';
 import { FirebaseMessage, Message, MESSAGES_PATH } from '../../store/messages/message';
 import { AuthenticationService } from '../auth/authentication.service';
 import { User } from '../../store/users/user';
@@ -44,45 +43,6 @@ export class ChatDispatcherService {
               private store: Store<{ conversations: Conversation[] }>) {
     this.initCurrentMessages();
   }
-
-  /* region CONVERSATIONS */
-
-  prepareListenToConversationUpserts(): void {
-    if (this.upsertedConversations$ === undefined) {
-      this.store.dispatch(new ConversationLoad());
-    }
-  }
-
-  listenToConversationUpserts(): Observable<Conversation[]> {
-    this.conversationCollection = this.afs.collection<FirebaseConversation>(
-      CONVERSATIONS_PATH,
-      ref => ref.where('userUids', 'array-contains', this.auth.state.value.uid)
-    );
-
-    return this.conversationCollection.snapshotChanges(['added', 'modified'])
-      .pipe(
-        map((conversationChangeActions) => {
-          return conversationChangeActions.map((changeAction: DocumentChangeAction<FirebaseConversation>) => {
-            const conversationChangeActionData = changeAction.payload.doc.data();
-            return new Conversation(changeAction.payload.doc.id, conversationChangeActionData.userUids, []);
-          });
-        })
-      );
-  }
-
-  createConversation(conversation: FirebaseConversation): Promise<DocumentReference> {
-    const firebaseConversation = {
-      userUids: conversation.userUids
-        .concat(this.auth.state.value.uid)
-    };
-    return this.conversationCollection.add(firebaseConversation);
-  }
-
-  private findUserInList(uid: string, users: User[]): User {
-    return users.find(user => user.uid === uid);
-  }
-
-  /* endregion */
 
   /* region MESSAGES */
 

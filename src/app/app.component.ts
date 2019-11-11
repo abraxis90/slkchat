@@ -10,6 +10,7 @@ import { AuthenticationService } from './services/auth/authentication.service';
 import { ChatDispatcherService } from './services/chat-dispatcher/chat-dispatcher.service';
 import { User } from './store/users/user';
 import { UserQuery } from './store/users/user.actions';
+import { ConversationQuery } from './store/converstions/conversation.actions';
 
 @Component({
   selector: 'app-root',
@@ -32,8 +33,7 @@ export class AppComponent {
     this.currentUser = auth.state.pipe(
       tap(user => {
         if (user !== null) {
-          // let the dispatcher decide whether a subscription needs to be made
-          this.chatDispatcher.prepareListenToConversationUpserts();
+          this.store.dispatch(new ConversationQuery());
           this.store.dispatch(new UserQuery());
         }
       })

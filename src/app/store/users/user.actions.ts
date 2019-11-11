@@ -18,31 +18,25 @@ export type UserActions =
 /* QUERY */
 export class UserQuery implements Action {
   readonly type = UserActionTypes.UserQuery;
-
-  constructor() {
-  }
 }
 
 /* ADDED */
 export class UserAdded implements Action {
   readonly type = UserActionTypes.UserAdded;
 
-  constructor(public payload: User) {
-  }
+  constructor(public payload: User) {}
 }
 
 /* MODIFIED */
 export class UserModified implements Action {
   readonly type = UserActionTypes.UserModified;
 
-  constructor(public payload: User) {
-  }
+  constructor(public payload: User) {}
 }
 
 /* REMOVED */
 export class UserRemoved implements Action {
   readonly type = UserActionTypes.UserRemoved;
 
-  constructor(public payload: User) {
-  }
+  constructor(public payload: User) {}
 }

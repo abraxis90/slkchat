@@ -9,23 +9,17 @@ const initialState = ConversationAdapter.getInitialState({
 export function conversationReducer(state = initialState,
                                     action: ConversationActions): ConversationState {
   switch (action.type) {
-    case ConversationActionTypes.ConversationLoad:
+    case ConversationActionTypes.ConversationQuery:
       return { ...state, loading: true };
 
-    case ConversationActionTypes.ConversationLoadSuccess:
-      return ConversationAdapter.addMany(action.payload, initialState);
+    case ConversationActionTypes.ConversationAdded:
+      return ConversationAdapter.addOne(action.payload, { ...state, loading: false });
 
-    case ConversationActionTypes.ConversationAdd:
-      return state;
-
-    case ConversationActionTypes.ConversationAddSuccess:
-      return state;
-
-    case ConversationActionTypes.ConversationMessageSend:
-      return state;
-
-    case  ConversationActionTypes.ConversationMessageSendSuccess:
-      return ConversationAdapter.upsertOne(action.payload, state);
+    case ConversationActionTypes.ConversationModified:
+      return ConversationAdapter.updateOne({
+        id: action.payload.uid,
+        changes: action.payload
+      }, state);
 
     default:
       return state;

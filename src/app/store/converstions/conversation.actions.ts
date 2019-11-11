@@ -1,60 +1,48 @@
 import { Action } from '@ngrx/store';
 
 import { Conversation, FirebaseConversation } from './conversation';
-import { Message } from '../messages/message';
 
 export enum ConversationActionTypes {
-  ConversationLoad = 'conversation.load',
-  ConversationLoadSuccess = 'conversation.load.success',
+  ConversationQuery = 'conversation.query',
+  ConversationAdded = 'conversation.added',
+  ConversationModified = 'conversation.modified',
   ConversationAdd = 'conversation.add',
   ConversationAddSuccess = 'conversation.add.success',
-  ConversationMessageSend = 'conversation.message.send',
-  ConversationMessageSendSuccess = 'conversation.message.send.success'
 }
 
 export type ConversationActions =
-  ConversationLoad
-  | ConversationLoadSuccess
+  ConversationQuery
+  | ConversationAdded
+  | ConversationModified
   | ConversationAdd
-  | ConversationAddSuccess
-  | ConversationMessageSend
-  | ConversationMessageSendSuccesss;
+  | ConversationAddSuccess;
 
-/* LOAD */
-export class ConversationLoad implements Action {
-  readonly type = ConversationActionTypes.ConversationLoad;
+/* QUERY */
+export class ConversationQuery implements Action {
+  readonly type = ConversationActionTypes.ConversationQuery;
 }
 
-export class ConversationLoadSuccess implements Action {
-  readonly type = ConversationActionTypes.ConversationLoadSuccess;
+/* ADDED */
+export class ConversationAdded implements Action {
+  readonly type = ConversationActionTypes.ConversationAdded;
 
-  constructor(public payload: Conversation[]) {
-  }
+  constructor(public payload: Conversation) {}
+}
+
+/* MODIFIED */
+export class ConversationModified implements Action {
+  readonly type = ConversationActionTypes.ConversationModified;
+
+  constructor(public payload: Conversation) {}
 }
 
 /* ADD */
 export class ConversationAdd implements Action {
   readonly type = ConversationActionTypes.ConversationAdd;
 
-  constructor(public payload: FirebaseConversation) {
-  }
+  constructor(public payload: FirebaseConversation) {}
 }
 
 export class ConversationAddSuccess implements Action {
   readonly type = ConversationActionTypes.ConversationAddSuccess;
-}
-
-/* MESSAGE SEND */
-export class ConversationMessageSend implements Action {
-  readonly type = ConversationActionTypes.ConversationMessageSend;
-
-  constructor(public payload: Message) {
-  }
-}
-
-export class ConversationMessageSendSuccesss implements Action {
-  readonly type = ConversationActionTypes.ConversationMessageSendSuccess;
-
-  constructor(public payload: Conversation) {
-  }
 }

@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable } from 'rxjs';
-import { filter, first, map } from 'rxjs/internal/operators';
+import { first, map } from 'rxjs/internal/operators';
 
 
 import { Conversation, ConversationWithUsers, FirebaseConversation } from '../../store/converstions/conversation';
@@ -11,9 +11,9 @@ import { User } from '../../store/users/user';
 import { selectAllConversations, selectConversationsByUserUids } from '../../store/converstions/conversation.selector';
 import { selectAllUsers } from '../../store/users/user.selector';
 import { ContactListComponent } from '../../reusables/components/contact-list/contact-list.component';
-import { ConversationAdd } from '../../store/converstions/conversation.actions';
 import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispatcher.service';
 import { AuthenticationService } from '../../services/auth/authentication.service';
+import { ConversationAdd } from '../../store/converstions/conversation.actions';
 
 @Component({
   selector: 'app-conversations-page',
