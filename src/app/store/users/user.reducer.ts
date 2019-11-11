@@ -8,8 +8,17 @@ export function userReducer(state = initialState,
                             action: UserActions): UserState {
   switch (action.type) {
 
-    case UserActionTypes.UserLoadSuccess:
-      return userAdapter.addMany(action.payload, initialState);
+    case UserActionTypes.UserAdded:
+      return userAdapter.addOne(action.payload, state);
+
+    case UserActionTypes.UserModified:
+      return userAdapter.updateOne({
+        id: action.payload.uid,
+        changes: action.payload
+      }, state);
+
+    case UserActionTypes.UserRemoved:
+      return userAdapter.removeOne(action.payload.uid, state);
 
     default:
       return state;

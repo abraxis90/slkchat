@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispatcher.service';
-import { UserDispatcherService } from '../users/user-dispatcher.service';
 import {
   ConversationActionTypes,
   ConversationAdd,
@@ -18,7 +17,6 @@ import { Conversation } from './conversation';
 export class ConversationEffects {
 
   constructor(private actions$: Actions,
-              private userDispatcher: UserDispatcherService,
               private conversationDispatcher: ChatDispatcherService) {}
 
   @Effect()

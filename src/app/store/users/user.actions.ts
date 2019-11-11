@@ -3,15 +3,46 @@ import { Action } from '@ngrx/store';
 import { User } from './user';
 
 export enum UserActionTypes {
-  UserLoadSuccess = 'user.load.success'
+  UserQuery = 'user.query',
+  UserAdded = 'user.added',
+  UserModified = 'user.modified',
+  UserRemoved = 'user.removed'
 }
 
-export type UserActions = UserLoadSuccess;
+export type UserActions =
+  UserQuery
+  | UserAdded
+  | UserModified
+  | UserRemoved;
 
-/* LOAD */
-export class UserLoadSuccess implements Action {
-  readonly type = UserActionTypes.UserLoadSuccess;
+/* QUERY */
+export class UserQuery implements Action {
+  readonly type = UserActionTypes.UserQuery;
 
-  constructor(public payload: User[]) {
+  constructor() {
+  }
+}
+
+/* ADDED */
+export class UserAdded implements Action {
+  readonly type = UserActionTypes.UserAdded;
+
+  constructor(public payload: User) {
+  }
+}
+
+/* MODIFIED */
+export class UserModified implements Action {
+  readonly type = UserActionTypes.UserModified;
+
+  constructor(public payload: User) {
+  }
+}
+
+/* REMOVED */
+export class UserRemoved implements Action {
+  readonly type = UserActionTypes.UserRemoved;
+
+  constructor(public payload: User) {
   }
 }
