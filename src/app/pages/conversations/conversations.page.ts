@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable } from 'rxjs';
-import { first, map } from 'rxjs/internal/operators';
+import { filter, first, map } from 'rxjs/internal/operators';
 
 
 import { Conversation, ConversationWithUsers, FirebaseConversation } from '../../store/converstions/conversation';
@@ -13,6 +13,7 @@ import { selectAllUsers } from '../../store/users/user.selector';
 import { ContactListComponent } from '../../reusables/components/contact-list/contact-list.component';
 import { ConversationAdd } from '../../store/converstions/conversation.actions';
 import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispatcher.service';
+import { AuthenticationService } from '../../services/auth/authentication.service';
 
 @Component({
   selector: 'app-conversations-page',
@@ -21,7 +22,12 @@ import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispa
 })
 export class ConversationsPageComponent {
   private conversations$: Observable<Conversation[]> = this.store.select(selectAllConversations);
-  public users$: Observable<User[]> = this.store.select(selectAllUsers);
+  public users$: Observable<User[]> = this.store.select(selectAllUsers).pipe(
+    map(users => {
+      // filter out own user
+      return users.filter(user => user.uid !== this.auth.state.value.uid);
+    })
+  );
   public conversationsDrawable$: Observable<ConversationWithUsers[]> =
     combineLatest(
       this.conversations$,
@@ -46,6 +52,7 @@ export class ConversationsPageComponent {
               private chatDispatcher: ChatDispatcherService,
               private router: Router,
               private route: ActivatedRoute,
+              private auth: AuthenticationService,
               private dialog: MatDialog) {
   }
 
