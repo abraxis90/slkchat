@@ -27,7 +27,7 @@ export class UserDispatcherService {
         map((changeActions: DocumentChangeAction<FirebaseUser>[]) => {
           return changeActions.map((changeAction: DocumentChangeAction<FirebaseUser>) => {
             const changeActionData: FirebaseUser = changeAction.payload.doc.data();
-            return new User(changeAction.payload.doc.id, changeActionData.email, changeActionData.displayName, changeActionData.photoURL);
+            return new User(changeAction.payload.doc.id, changeActionData.email, changeActionData.fullName, changeActionData.avatarURL);
           });
         })
       )

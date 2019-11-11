@@ -8,19 +8,15 @@ import { environment } from '../environments/environment';
 import { EffectsModule } from '@ngrx/effects';
 import { ConversationEffects } from './store/converstions/conversation.effects';
 import { userReducer } from './store/users/user.reducer';
-import { messageReducer } from './store/messages/message.reducer';
-import { MessageEffects } from './store/messages/message.effects';
 
 @NgModule({
   imports: [
     StoreModule.forRoot({
       user: userReducer,
-      conversation: conversationReducer,
-      message: messageReducer
+      conversation: conversationReducer
     }),
     EffectsModule.forRoot([
-      ConversationEffects,
-      MessageEffects
+      ConversationEffects
     ]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production } as StoreDevtoolsOptions),
   ],

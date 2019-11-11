@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { auth, User } from 'firebase/app';
+import { auth } from 'firebase/app';
 import { BehaviorSubject } from 'rxjs';
 import { first, map } from 'rxjs/internal/operators';
 import { Router } from '@angular/router';
+import { User } from '../../store/users/user';
 
 
 @Injectable({
@@ -14,8 +15,17 @@ export class AuthenticationService {
   public state: BehaviorSubject<User | null> = new BehaviorSubject<User>(null);
 
   constructor(private afAuth: AngularFireAuth, private router: Router) {
-    this.afAuth.authState.subscribe(user => {
-      this.state.next(user);
+    this.afAuth.authState.subscribe((userRecord) => {
+      if (userRecord) {
+        this.state.next(
+          new User(userRecord.uid,
+            userRecord.email,
+            userRecord.displayName,
+            userRecord.photoURL)
+        );
+      } else {
+        this.state.next(null);
+      }
     });
   }
 

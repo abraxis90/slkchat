@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Conversation } from '../../../store/converstions/conversation';
+import { Conversation, ConversationWithUsers } from '../../../store/converstions/conversation';
 
 @Component({
   selector: 'app-conversation-list-item',
@@ -8,7 +8,7 @@ import { Conversation } from '../../../store/converstions/conversation';
 })
 export class ConversationListItemComponent {
 
-  @Input() conversation: Conversation;
+  @Input() conversation: ConversationWithUsers;
 
   constructor() { }
 

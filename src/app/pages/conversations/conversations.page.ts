@@ -6,7 +6,7 @@ import { combineLatest, Observable } from 'rxjs';
 import { first, map } from 'rxjs/internal/operators';
 
 
-import { Conversation, FirebaseConversation } from '../../store/converstions/conversation';
+import { Conversation, ConversationWithUsers, FirebaseConversation } from '../../store/converstions/conversation';
 import { User } from '../../store/users/user';
 import { selectAllConversations, selectConversationsByUserUids } from '../../store/converstions/conversation.selector';
 import { selectAllUsers } from '../../store/users/user.selector';
@@ -22,7 +22,7 @@ import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispa
 export class ConversationsPageComponent {
   private conversations$: Observable<Conversation[]> = this.store.select(selectAllConversations);
   public users$: Observable<User[]> = this.store.select(selectAllUsers);
-  public conversationsDrawable$: Observable<Conversation[]> =
+  public conversationsDrawable$: Observable<ConversationWithUsers[]> =
     combineLatest(
       this.conversations$,
       this.users$
@@ -30,13 +30,14 @@ export class ConversationsPageComponent {
       map(([conversations, users]) => {
         return conversations
           .map((conversation: Conversation) => {
-            if (conversation.users && conversation.users.length) {
-              conversation.users = conversation.users
-                .map(user => {
-                  return this.findUserInList(user.uid, users);
-                });
+            if (conversation.userUids && conversation.userUids.length) {
+              (conversation as ConversationWithUsers).users = conversation.userUids
+                .map(userUid => {
+                  return this.findUserInList(userUid, users);
+                })
+                .filter(user => user !== undefined);
             }
-            return conversation;
+            return conversation as ConversationWithUsers;
           });
       })
     );
@@ -64,7 +65,7 @@ export class ConversationsPageComponent {
                 this.navigateToConversationByUid(matchingConversations[0].uid);
               } else {
                 // create conversation if it doesn't exist
-                const freshConversation = { users: selectedContacts.map(user => user.uid) } as FirebaseConversation;
+                const freshConversation = { userUids: selectedContacts.map(user => user.uid) } as FirebaseConversation;
                 this.store.dispatch(new ConversationAdd(freshConversation));
               }
             });

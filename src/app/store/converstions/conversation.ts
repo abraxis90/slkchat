@@ -4,12 +4,17 @@ import { User } from '../users/user';
 export const CONVERSATIONS_PATH = 'CONVERSATIONS';
 
 export interface FirebaseConversation {
-  users: string[];
+  userUids: string[];
 }
 
-export class Conversation {
+export interface ConversationWithUsers extends Conversation {
+  users: User[];
+}
+
+export class Conversation implements FirebaseConversation {
 
   constructor(public uid: string | undefined,
-              public users: User[]) {
+              public userUids: string[],
+              public messages: Message[]) {
   }
 }

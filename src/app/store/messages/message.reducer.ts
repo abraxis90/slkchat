@@ -23,7 +23,7 @@ export function messageReducer(state = initialState,
       return state;
 
     case MessageActionTypes.MessageAddSuccess:
-      return MessageAdapter.addMany(action.payload, state);
+      return MessageAdapter.addMany(action.payload, initialState);
 
     default:
       return state;
