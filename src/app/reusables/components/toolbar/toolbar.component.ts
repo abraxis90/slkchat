@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { empty, Observable } from 'rxjs';
 
 import { AuthenticationService } from '../../../services/auth/authentication.service';
 import { flatMap, map } from 'rxjs/operators';
@@ -24,12 +24,7 @@ export class ToolbarComponent implements OnInit {
               private store: Store<Conversation>) {}
 
   ngOnInit(): void {
-    this.currentConversation$ = this.chatDispatcher.currentConversationUid$
-      .pipe(
-        flatMap(conversationUid => {
-          return this.store.select(selectConversationByUid(), conversationUid);
-        })
-      );
+    this.currentConversation$ = empty();
   }
 
   logout(): void {

@@ -6,8 +6,8 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from '../../services/auth/authentication.service';
 import { firestore } from 'firebase/app';
 import { Store } from '@ngrx/store';
-import { MessageActionTypes, MessageAdd } from '../../store/messages/message.actions';
-import { selectAllMessages, selectMessagesLoading } from '../../store/messages/message.selector';
+import { ConversationMessageAdd, ConversationMessageQuery } from '../../store/converstions/conversation.actions';
+import { selectConversationMessages, selectConversationMessagesLoading } from '../../store/converstions/conversation.selector';
 
 const SCROLL_INTO_VIEW_OPTS: ScrollIntoViewOptions = { behavior: 'auto', block: 'start' };
 const SCROLL_INTO_VIEW_TIMEOUT = 50;
@@ -18,8 +18,8 @@ const SCROLL_INTO_VIEW_TIMEOUT = 50;
   styleUrls: ['./conversation.page.scss'],
 })
 export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestroy {
-  public messages$: Observable<Message[]> = this.store.select(selectAllMessages);
-  public messagesLoading$: Observable<boolean> = this.store.select(selectMessagesLoading);
+  public messages$: Observable<Message[]>;
+  public messagesLoading$: Observable<boolean>;
   public chatVisible = false;
   private conversationUid: string;
   private subscriptions: Subscription[] = [];
@@ -37,8 +37,9 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
 
   ngOnInit(): void {
     this.conversationUid = this.route.snapshot.paramMap.get('uid');
-    // TODO why not use constructor?
-    this.store.dispatch({ type: MessageActionTypes.MessagesLoad, payload: this.conversationUid });
+    this.messagesLoading$ = this.store.select(selectConversationMessagesLoading(), this.conversationUid);
+    this.messages$ = this.store.select(selectConversationMessages(), this.conversationUid);
+    this.store.dispatch(new ConversationMessageQuery(this.conversationUid));
     this.subscriptions.push(
       this.chatDispatcher.messageFromOtherUser$
         .subscribe(isFromOtherUser => {
@@ -62,7 +63,6 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
-    this.chatDispatcher.dropCurrentMessages();
   }
 
   /* region API */
@@ -74,14 +74,13 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
       from: this.auth.state.value.uid,
       sentAt: firestore.Timestamp.fromDate(new Date())
     };
-    this.store.dispatch(new MessageAdd(firebaseMessage));
+    this.store.dispatch(new ConversationMessageAdd(firebaseMessage));
   }
 
   private handleMessageReceived(isFromOtherUser: boolean): void {
     if (!isFromOtherUser) {
       this.scrollIntoView(this.messageEnd);
     } else {
-      // TODO: have an objective way of determining when the user is scrolled enough away from the screen
       if (this.messageList.nativeElement.offsetHeight - this.conversationPage.nativeElement.scrollTop < 1000) {
         this.scrollIntoView(this.messageEnd);
       } else {

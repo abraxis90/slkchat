@@ -2,7 +2,6 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 
 import { ConversationState } from './conversation.state';
 import { ConversationAdapter } from './conversation.adapter';
-import { User } from '../users/user';
 import { Conversation } from './conversation';
 
 const selectConversationState = createFeatureSelector<ConversationState>('conversation');
@@ -11,6 +10,11 @@ const conversationEntitySelectors = ConversationAdapter.getSelectors();
 export const selectAllConversations = createSelector(
   selectConversationState,
   conversationEntitySelectors.selectAll
+);
+
+export const selectConversationEntities = createSelector(
+  selectConversationState,
+  ConversationAdapter.getSelectors().selectEntities
 );
 
 export const selectConversationByUid = () => createSelector(
@@ -32,4 +36,16 @@ export const selectConversationsByUserUids = () =>
         return JSON.stringify(conversationUserUids) === JSON.stringify(userUids);
       });
     }
+  );
+
+export const selectConversationMessagesLoading = () =>
+  createSelector(
+    selectConversationEntities,
+    (conversationEntities, conversationUid) => conversationEntities[conversationUid].messagesLoading
+  );
+
+export const selectConversationMessages = () =>
+  createSelector(
+    selectConversationEntities,
+    (conversationEntities, conversationUid) => conversationEntities[conversationUid].messages
   );

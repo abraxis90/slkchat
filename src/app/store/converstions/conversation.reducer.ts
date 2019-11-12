@@ -13,12 +13,21 @@ export function conversationReducer(state = initialState,
       return { ...state, loading: true };
 
     case ConversationActionTypes.ConversationAdded:
-      return ConversationAdapter.addOne(action.payload, { ...state, loading: false });
+      return ConversationAdapter.addOne({ ...action.payload, messages: [], messagesLoading: true }, { ...state, loading: false });
 
     case ConversationActionTypes.ConversationModified:
       return ConversationAdapter.updateOne({
         id: action.payload.uid,
         changes: action.payload
+      }, state);
+
+    case ConversationActionTypes.ConversationMessageAdded:
+      return ConversationAdapter.updateOne({
+        id: action.payload.conversationUid,
+        changes: {
+          messages: state.entities[action.payload.conversationUid].messages.concat(action.payload),
+          messagesLoading: false
+        }
       }, state);
 
     default:
