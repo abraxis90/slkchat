@@ -3,7 +3,7 @@ import { AngularFirestore, DocumentChangeAction } from '@angular/fire/firestore'
 import { Action } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { ChatDispatcherService, START_OF_TODAY } from '../../services/chat-dispatcher/chat-dispatcher.service';
-import { first, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { first, map, mergeMap, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { combineLatest, from, Observable, of } from 'rxjs';
 
 import { CONVERSATIONS_PATH, FirebaseConversation } from './conversation';
@@ -17,7 +17,7 @@ import {
   ConversationMessageLoad,
   ConversationMessageLoadSuccess,
   ConversationMessageNoop,
-  ConversationMessageQuery,
+  ConversationMessageQuery, ConversationMessageQueryStop,
   ConversationQuery,
 } from './conversation.actions';
 import { AuthenticationService } from '../../services/auth/authentication.service';
@@ -109,6 +109,14 @@ export class ConversationEffects {
   );
 
   @Effect()
+  messageQueryStop$: Observable<Action> = this.actions$.pipe(
+    ofType(ConversationActionTypes.ConversationMessageQueryStop as string),
+    map(() => {
+      return new ConversationMessageNoop();
+    })
+  );
+
+  @Effect()
   messageQuery$: Observable<Action> = this.actions$.pipe(
     ofType(ConversationActionTypes.ConversationMessageQuery as string),
     switchMap((action: ConversationMessageQuery) => {
@@ -117,7 +125,8 @@ export class ConversationEffects {
         ref => {
           return ref.where('sentAt', '>=', START_OF_TODAY).orderBy('sentAt');
         }
-      ).stateChanges();
+      ).stateChanges()
+        .pipe(takeUntil(this.messageQueryStop$));
     }),
     mergeMap(actions => actions),
     map(action => {

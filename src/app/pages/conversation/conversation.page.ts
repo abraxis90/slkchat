@@ -6,7 +6,12 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from '../../services/auth/authentication.service';
 import { firestore } from 'firebase/app';
 import { Store } from '@ngrx/store';
-import { ConversationMessageAdd, ConversationMessageLoad, ConversationMessageQuery } from '../../store/converstions/conversation.actions';
+import {
+  ConversationMessageAdd,
+  ConversationMessageLoad,
+  ConversationMessageQuery,
+  ConversationMessageQueryStop
+} from '../../store/converstions/conversation.actions';
 import { selectConversationMessages, selectConversationMessagesLoading } from '../../store/converstions/conversation.selector';
 
 const SCROLL_INTO_VIEW_OPTS: ScrollIntoViewOptions = { behavior: 'auto', block: 'start' };
@@ -64,6 +69,7 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.store.dispatch(new ConversationMessageQueryStop());
   }
 
   /* region API */

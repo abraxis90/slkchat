@@ -17,6 +17,7 @@ export enum ConversationActionTypes {
   ConversationMessageLoad = 'conversation.message.load',
   ConversationMessageLoadSuccess = 'conversation.message.load.success',
   ConversationMessageQuery = 'conversation.message.query',
+  ConversationMessageQueryStop = 'conversation.message.query.stop',
   ConversationMessageQueryLast = 'conversation.message.query.last',
   ConversationMessageAdded = 'conversation.message.added',
   ConversationMessageAdd = 'conversation.message.add',
@@ -32,6 +33,7 @@ export type ConversationActions =
   | ConversationMessageLoad
   | ConversationMessageLoadSuccess
   | ConversationMessageQuery
+  | ConversationMessageQueryStop
   | ConversationMessageQueryLast
   | ConversationMessageAdded
   | ConversationMessageAdd
@@ -100,6 +102,10 @@ export class ConversationMessageQuery implements Action {
 
   // load by conversationUid
   constructor(public payload: string) {}
+}
+
+export class ConversationMessageQueryStop {
+  readonly type = ConversationActionTypes.ConversationMessageQueryStop;
 }
 
 export class ConversationMessageQueryLast implements Action {
