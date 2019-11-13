@@ -33,7 +33,7 @@ export function conversationReducer(state = initialState,
         id: action.payload.conversationUid,
         changes: {
           messagesLoading: false,
-          ...action.payload.messages
+          messages: state.entities[action.payload.conversationUid].messages.concat(action.payload.messages)
         }
       }, state);
 
