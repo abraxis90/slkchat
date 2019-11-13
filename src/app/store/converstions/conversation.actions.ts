@@ -16,9 +16,7 @@ export enum ConversationActionTypes {
   ConversationAddSuccess = 'conversation.add.success',
   ConversationMessageLoad = 'conversation.message.load',
   ConversationMessageLoadSuccess = 'conversation.message.load.success',
-  ConversationMessageQuery = 'conversation.message.query',
-  ConversationMessageQueryStop = 'conversation.message.query.stop',
-  ConversationMessageQueryLast = 'conversation.message.query.last',
+  ConversationMessageQueryAll = 'conversation.message.query.all',
   ConversationMessageAdded = 'conversation.message.added',
   ConversationMessageAdd = 'conversation.message.add',
   ConversationMessageAddSuccess = 'conversation.message.add.success'
@@ -32,9 +30,7 @@ export type ConversationActions =
   | ConversationAddSuccess
   | ConversationMessageLoad
   | ConversationMessageLoadSuccess
-  | ConversationMessageQuery
-  | ConversationMessageQueryStop
-  | ConversationMessageQueryLast
+  | ConversationMessageQueryAll
   | ConversationMessageAdded
   | ConversationMessageAdd
   | ConversationMessageAddSuccess;
@@ -97,19 +93,8 @@ export class ConversationMessageLoadSuccess implements Action {
 }
 
 /* QUERY */
-export class ConversationMessageQuery implements Action {
-  readonly type = ConversationActionTypes.ConversationMessageQuery;
-
-  // load by conversationUid
-  constructor(public payload: string) {}
-}
-
-export class ConversationMessageQueryStop {
-  readonly type = ConversationActionTypes.ConversationMessageQueryStop;
-}
-
-export class ConversationMessageQueryLast implements Action {
-  readonly type = ConversationActionTypes.ConversationMessageQueryLast;
+export class ConversationMessageQueryAll implements Action {
+  readonly type = ConversationActionTypes.ConversationMessageQueryAll;
 }
 
 /* ADDED */

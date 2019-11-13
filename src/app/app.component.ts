@@ -10,7 +10,7 @@ import { AuthenticationService } from './services/auth/authentication.service';
 import { ChatDispatcherService } from './services/chat-dispatcher/chat-dispatcher.service';
 import { User } from './store/users/user';
 import { UserQuery } from './store/users/user.actions';
-import { ConversationQuery } from './store/converstions/conversation.actions';
+import { ConversationMessageQueryAll, ConversationQuery } from './store/converstions/conversation.actions';
 
 @Component({
   selector: 'app-root',
@@ -35,6 +35,7 @@ export class AppComponent {
         if (user !== null) {
           this.store.dispatch(new ConversationQuery());
           this.store.dispatch(new UserQuery());
+          this.store.dispatch(new ConversationMessageQueryAll());
         }
       })
     );

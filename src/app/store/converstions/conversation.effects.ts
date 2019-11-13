@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, DocumentChangeAction } from '@angular/fire/firestore';
-import { Action } from '@ngrx/store';
+import { Action, Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { ChatDispatcherService, START_OF_TODAY } from '../../services/chat-dispatcher/chat-dispatcher.service';
-import { first, map, mergeMap, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { first, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { combineLatest, from, Observable, of } from 'rxjs';
 
-import { CONVERSATIONS_PATH, FirebaseConversation } from './conversation';
+import { Conversation, CONVERSATIONS_PATH, FirebaseConversation } from './conversation';
 import {
   ConversationActionTypes,
   ConversationAdd,
@@ -17,17 +17,19 @@ import {
   ConversationMessageLoad,
   ConversationMessageLoadSuccess,
   ConversationMessageNoop,
-  ConversationMessageQuery, ConversationMessageQueryStop,
+  ConversationMessageQueryAll,
   ConversationQuery,
 } from './conversation.actions';
 import { AuthenticationService } from '../../services/auth/authentication.service';
 import { FirebaseMessage, Message, MESSAGES_PATH } from '../messages/message';
+import { selectConversationIds } from './conversation.selector';
 
 @Injectable()
 export class ConversationEffects {
 
   constructor(private readonly afs: AngularFirestore,
               private readonly auth: AuthenticationService,
+              private readonly store: Store<Conversation>,
               private actions$: Actions,
               private chatDispatcher: ChatDispatcherService) {}
 
@@ -109,27 +111,22 @@ export class ConversationEffects {
   );
 
   @Effect()
-  messageQueryStop$: Observable<Action> = this.actions$.pipe(
-    ofType(ConversationActionTypes.ConversationMessageQueryStop as string),
-    map(() => {
-      return new ConversationMessageNoop();
-    })
-  );
-
-  @Effect()
-  messageQuery$: Observable<Action> = this.actions$.pipe(
-    ofType(ConversationActionTypes.ConversationMessageQuery as string),
-    switchMap((action: ConversationMessageQuery) => {
-      return this.afs.collection<FirebaseMessage>(
-        `${CONVERSATIONS_PATH}/${action.payload}/${MESSAGES_PATH}`,
-        ref => {
-          return ref.where('sentAt', '>=', START_OF_TODAY).orderBy('sentAt');
-        }
-      ).stateChanges()
-        .pipe(takeUntil(this.messageQueryStop$));
+  latestMessagesQuery$: Observable<Action> = this.actions$.pipe(
+    ofType(ConversationActionTypes.ConversationMessageQueryAll),
+    switchMap((action: ConversationMessageQueryAll) => this.store.select(selectConversationIds)),
+    switchMap((conversationIds: string[]) => {
+      return conversationIds.map(id => {
+        return this.afs.collection(
+          `${CONVERSATIONS_PATH}/${id}/${MESSAGES_PATH}`,
+          ref => {
+            return ref.where('sentAt', '>=', START_OF_TODAY).orderBy('sentAt');
+          }
+        ).stateChanges();
+      });
     }),
     mergeMap(actions => actions),
-    map(action => {
+    mergeMap(actions => actions),
+    map((action: DocumentChangeAction<Message>) => {
       return {
         type: `conversation.message.${action.type}`,
         payload: { uid: action.payload.doc.id, ...action.payload.doc.data() }

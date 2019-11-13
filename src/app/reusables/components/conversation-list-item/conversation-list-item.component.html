@@ -1,17 +1,15 @@
-<!-- TODO: display last sent message -->
 <button mat-list-item>
-  <ng-container *ngIf="conversation.users?.length === 1 && conversation.users[0]; then privateChat; else groupChat">
-  </ng-container>
+  <img class="user-avatar" matListAvatar [src]="conversation.users[0]?.avatarURL" alt="user avatar"/>
+  <h3 matLine>{{ conversation.users[0]?.fullName }}</h3>
+  <p class="last-message" *ngIf="conversation?.messages.length" matLine>
+    <small class="last-message-body">
+      {{ conversation?.messages[conversation.messages.length - 1]?.body }}
+    </small>
+    <small class="last-message-separator">-</small>
+    <small>
+      {{ conversation?.messages[conversation.messages.length - 1]?.sentAt.seconds * 1000 | date: 'shortTime' }}
+    </small>
+  </p>
 </button>
-<ng-template #privateChat>
-  <img class="user-avatar" [src]="conversation.users[0]?.avatarURL" alt="user avatar"/>
-  <span class="user-full-name" fxFlex>{{ conversation.users[0].fullName }}</span>
-</ng-template>
 
-<ng-template #groupChat>
-  <img class="user-avatar" [src]="conversation.users[0]?.avatarURL" alt="user avatar"/>
-  <div *ngFor="let user of conversation.users; let last = last">
-    <span class="user-full-name" fxFlex>{{ user?.fullName }}</span>
-    <span *ngIf="!last" class="user-group-comma">,</span>
-  </div>
-</ng-template>
+<!-- TODO: group chat -->

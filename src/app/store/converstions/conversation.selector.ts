@@ -17,6 +17,11 @@ export const selectConversationEntities = createSelector(
   ConversationAdapter.getSelectors().selectEntities
 );
 
+export const selectConversationIds = createSelector(
+  selectConversationState,
+  ConversationAdapter.getSelectors().selectIds
+);
+
 export const selectConversationByUid = () => createSelector(
   selectAllConversations,
   (conversations: Conversation[], uid) => {
@@ -41,11 +46,13 @@ export const selectConversationsByUserUids = () =>
 export const selectConversationMessagesLoading = () =>
   createSelector(
     selectConversationEntities,
-    (conversationEntities, conversationUid) => conversationEntities[conversationUid] ? conversationEntities[conversationUid].messagesLoading : false
+    (conversationEntities, conversationUid) => conversationEntities[conversationUid] ?
+      conversationEntities[conversationUid].messagesLoading : false
   );
 
 export const selectConversationMessages = () =>
   createSelector(
     selectConversationEntities,
-    (conversationEntities, conversationUid) => conversationEntities[conversationUid] ? conversationEntities[conversationUid].messages : []
+    (conversationEntities, conversationUid) => conversationEntities[conversationUid] ?
+      conversationEntities[conversationUid].messages : []
   );

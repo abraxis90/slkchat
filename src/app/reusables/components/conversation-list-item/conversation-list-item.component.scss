@@ -1,9 +1,24 @@
 button {
   text-transform: none;
 
-  .user-avatar {
-    margin-right: 12px;
-    padding: 8px 0;
+  small {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .last-message {
+    display: flex;
+
+    .last-message-body {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 0 1 auto;
+    }
+
+    .last-message-separator {
+      margin: 0 4px;
+    }
   }
 
   .user-group-comma {
