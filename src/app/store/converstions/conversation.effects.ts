@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore, DocumentChangeAction } from '@angular/fire/firestore';
 import { Action } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispatcher.service';
-import { map, mergeMap, switchMap, tap } from 'rxjs/operators';
-import { from, Observable } from 'rxjs';
+import { ChatDispatcherService, START_OF_TODAY } from '../../services/chat-dispatcher/chat-dispatcher.service';
+import { first, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { combineLatest, from, Observable, of } from 'rxjs';
 
 import { CONVERSATIONS_PATH, FirebaseConversation } from './conversation';
 import {
@@ -14,12 +14,14 @@ import {
   ConversationMessageAdd,
   ConversationMessageAdded,
   ConversationMessageAddSuccess,
+  ConversationMessageLoad,
+  ConversationMessageLoadSuccess,
   ConversationMessageNoop,
   ConversationMessageQuery,
   ConversationQuery,
 } from './conversation.actions';
 import { AuthenticationService } from '../../services/auth/authentication.service';
-import { FirebaseMessage, MESSAGES_PATH } from '../messages/message';
+import { FirebaseMessage, Message, MESSAGES_PATH } from '../messages/message';
 
 @Injectable()
 export class ConversationEffects {
@@ -44,7 +46,12 @@ export class ConversationEffects {
     map(action => {
       return {
         type: `conversation.${action.type}`,
-        payload: { uid: action.payload.doc.id, ...action.payload.doc.data() }
+        payload: {
+          uid: action.payload.doc.id,
+          ...action.payload.doc.data(),
+          messages: [],
+          messagesLoading: true
+        }
       };
     })
   );
@@ -69,13 +76,46 @@ export class ConversationEffects {
   /* region MESSAGES */
 
   @Effect()
+  messageLoad$: Observable<Action> = this.actions$.pipe(
+    ofType(ConversationActionTypes.ConversationMessageLoad as string),
+    switchMap((action: ConversationMessageLoad) => {
+      const snapshotChanges = this.afs.collection<FirebaseMessage>(
+        `${CONVERSATIONS_PATH}/${action.payload.conversationUid}/${MESSAGES_PATH}`,
+        ref => {
+          return ref.where('sentAt', '<=', START_OF_TODAY)
+            .orderBy('sentAt')
+            .limit(20);
+        }
+      ).snapshotChanges(['added']).pipe(first());
+
+      return combineLatest([snapshotChanges, of(action.payload.conversationUid)]);
+    }),
+    map(([messageChangeActions, conversationUid]) => {
+      const messages = messageChangeActions.map((messageChangeAction: DocumentChangeAction<FirebaseMessage>) => {
+        const messageData: FirebaseMessage = messageChangeAction.payload.doc.data();
+        return new Message(
+          messageChangeAction.payload.doc.id,
+          messageData.conversationUid,
+          messageData.body,
+          messageData.from,
+          undefined,
+          messageData.sentAt);
+      });
+      return new ConversationMessageLoadSuccess({
+        conversationUid: conversationUid,
+        messages: messages
+      });
+    })
+  );
+
+  @Effect()
   messageQuery$: Observable<Action> = this.actions$.pipe(
     ofType(ConversationActionTypes.ConversationMessageQuery as string),
     switchMap((action: ConversationMessageQuery) => {
       return this.afs.collection<FirebaseMessage>(
         `${CONVERSATIONS_PATH}/${action.payload}/${MESSAGES_PATH}`,
         ref => {
-          return ref.orderBy('sentAt');
+          return ref.where('sentAt', '>=', START_OF_TODAY).orderBy('sentAt');
         }
       ).stateChanges();
     }),
@@ -93,11 +133,7 @@ export class ConversationEffects {
     .pipe(
       ofType(ConversationActionTypes.ConversationMessageAdded as string),
       tap((action: ConversationMessageAdded) => {
-        if (action.payload && action.payload.from === this.auth.state.value.uid) {
-          this.chatDispatcher.messageFromOtherUser$.next(false);
-        } else {
-          this.chatDispatcher.messageFromOtherUser$.next(true);
-        }
+        this.chatDispatcher.messageFromOtherUser$.next(action.payload && action.payload.from !== this.auth.state.value.uid);
       }),
       map(() => {
         return new ConversationMessageNoop();

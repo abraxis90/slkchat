@@ -9,11 +9,27 @@ const initialState = ConversationAdapter.getInitialState({
 export function conversationReducer(state = initialState,
                                     action: ConversationActions): ConversationState {
   switch (action.type) {
+
+    case ConversationActionTypes.ConversationMessageLoad:
+      return ConversationAdapter.updateOne({
+        id: action.payload.conversationUid,
+        changes: { messagesLoading: true }
+      }, state);
+
+    case ConversationActionTypes.ConversationMessageLoadSuccess:
+      return ConversationAdapter.updateOne({
+        id: action.payload.conversationUid,
+        changes: {
+          messages: action.payload.messages,
+          messagesLoading: false
+        }
+      }, state);
+
     case ConversationActionTypes.ConversationQuery:
       return { ...state, loading: true };
 
     case ConversationActionTypes.ConversationAdded:
-      return ConversationAdapter.addOne({ ...action.payload, messages: [], messagesLoading: true }, { ...state, loading: false });
+      return ConversationAdapter.addOne({ ...action.payload }, { ...state, loading: false });
 
     case ConversationActionTypes.ConversationModified:
       return ConversationAdapter.updateOne({
@@ -26,7 +42,6 @@ export function conversationReducer(state = initialState,
         id: action.payload.conversationUid,
         changes: {
           messages: state.entities[action.payload.conversationUid].messages.concat(action.payload),
-          messagesLoading: false
         }
       }, state);
 

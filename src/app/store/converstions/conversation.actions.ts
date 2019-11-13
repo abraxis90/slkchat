@@ -2,6 +2,7 @@ import { Action } from '@ngrx/store';
 
 import { Conversation, FirebaseConversation } from './conversation';
 import { FirebaseMessage, Message } from '../messages/message';
+import { DocumentSnapshot } from '@angular/fire/firestore';
 
 export class ConversationMessageNoop implements Action {
   readonly type = 'conversation.message.noop';
@@ -14,7 +15,7 @@ export enum ConversationActionTypes {
   ConversationAdd = 'conversation.add',
   ConversationAddSuccess = 'conversation.add.success',
   ConversationMessageLoad = 'conversation.message.load',
-  ConversationMessageLoadSuccess = 'conversation.message.success',
+  ConversationMessageLoadSuccess = 'conversation.message.load.success',
   ConversationMessageQuery = 'conversation.message.query',
   ConversationMessageQueryLast = 'conversation.message.query.last',
   ConversationMessageAdded = 'conversation.message.added',
@@ -28,6 +29,8 @@ export type ConversationActions =
   | ConversationModified
   | ConversationAdd
   | ConversationAddSuccess
+  | ConversationMessageLoad
+  | ConversationMessageLoadSuccess
   | ConversationMessageQuery
   | ConversationMessageQueryLast
   | ConversationMessageAdded
@@ -69,6 +72,27 @@ export class ConversationAddSuccess implements Action {
 /* endregion */
 
 /* region CONVERSATION MESSAGES */
+
+/* LOAD */
+export class ConversationMessageLoad implements Action {
+  readonly type = ConversationActionTypes.ConversationMessageLoad;
+
+  // load by conversationUid
+  constructor(public payload: {
+    conversationUid: string,
+    lastMessage?: DocumentSnapshot<Message>
+  }) {}
+}
+
+/* LOAD SUCCESS */
+export class ConversationMessageLoadSuccess implements Action {
+  readonly type = ConversationActionTypes.ConversationMessageLoadSuccess;
+
+  constructor(public payload: {
+    conversationUid: string,
+    messages: Message[]
+  }) {}
+}
 
 /* QUERY */
 export class ConversationMessageQuery implements Action {

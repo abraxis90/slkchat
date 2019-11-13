@@ -6,7 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from '../../services/auth/authentication.service';
 import { firestore } from 'firebase/app';
 import { Store } from '@ngrx/store';
-import { ConversationMessageAdd, ConversationMessageQuery } from '../../store/converstions/conversation.actions';
+import { ConversationMessageAdd, ConversationMessageLoad, ConversationMessageQuery } from '../../store/converstions/conversation.actions';
 import { selectConversationMessages, selectConversationMessagesLoading } from '../../store/converstions/conversation.selector';
 
 const SCROLL_INTO_VIEW_OPTS: ScrollIntoViewOptions = { behavior: 'auto', block: 'start' };
@@ -39,6 +39,7 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
     this.conversationUid = this.route.snapshot.paramMap.get('uid');
     this.messagesLoading$ = this.store.select(selectConversationMessagesLoading(), this.conversationUid);
     this.messages$ = this.store.select(selectConversationMessages(), this.conversationUid);
+    this.store.dispatch(new ConversationMessageLoad({ conversationUid: this.conversationUid }));
     this.store.dispatch(new ConversationMessageQuery(this.conversationUid));
     this.subscriptions.push(
       this.chatDispatcher.messageFromOtherUser$

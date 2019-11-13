@@ -41,11 +41,11 @@ export const selectConversationsByUserUids = () =>
 export const selectConversationMessagesLoading = () =>
   createSelector(
     selectConversationEntities,
-    (conversationEntities, conversationUid) => conversationEntities[conversationUid].messagesLoading
+    (conversationEntities, conversationUid) => conversationEntities[conversationUid] ? conversationEntities[conversationUid].messagesLoading : false
   );
 
 export const selectConversationMessages = () =>
   createSelector(
     selectConversationEntities,
-    (conversationEntities, conversationUid) => conversationEntities[conversationUid].messages
+    (conversationEntities, conversationUid) => conversationEntities[conversationUid] ? conversationEntities[conversationUid].messages : []
   );
