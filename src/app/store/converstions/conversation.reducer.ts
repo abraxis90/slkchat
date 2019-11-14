@@ -33,7 +33,9 @@ export function conversationReducer(state = initialState,
         id: action.payload.conversationUid,
         changes: {
           messagesLoading: false,
-          messages: state.entities[action.payload.conversationUid].messages.concat(action.payload.messages)
+          messages: action.payload.messages
+            .concat(state.entities[action.payload.conversationUid].messages)
+            .sort((msgA, msgB) => msgA.sentAt.seconds - msgB.sentAt.seconds)
         }
       }, state);
 
@@ -41,7 +43,9 @@ export function conversationReducer(state = initialState,
       return ConversationAdapter.updateOne({
         id: action.payload.conversationUid,
         changes: {
-          messages: state.entities[action.payload.conversationUid].messages.concat(action.payload),
+          messages: [action.payload]
+            .concat(state.entities[action.payload.conversationUid].messages)
+            .sort((msgA, msgB) => msgA.sentAt.seconds - msgB.sentAt.seconds)
         }
       }, state);
 

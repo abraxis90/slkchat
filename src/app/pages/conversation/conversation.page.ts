@@ -6,8 +6,9 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from '../../services/auth/authentication.service';
 import { firestore } from 'firebase/app';
 import { Store } from '@ngrx/store';
-import { ConversationMessageAdd, ConversationMessageLoad } from '../../store/converstions/conversation.actions';
-import { selectConversationMessages, selectConversationMessagesLoading } from '../../store/converstions/conversation.selector';
+import { ConversationMessageAdd } from '../../store/converstions/conversation.actions';
+import { selectConversationMessages } from '../../store/converstions/conversation.selector';
+import { debounceTime, first, map } from 'rxjs/operators';
 
 const SCROLL_INTO_VIEW_OPTS: ScrollIntoViewOptions = { behavior: 'auto', block: 'start' };
 const SCROLL_INTO_VIEW_TIMEOUT = 50;
@@ -17,9 +18,9 @@ const SCROLL_INTO_VIEW_TIMEOUT = 50;
   templateUrl: './conversation.page.html',
   styleUrls: ['./conversation.page.scss'],
 })
-export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ConversationPageComponent implements OnInit, AfterViewInit {
   public messages$: Observable<Message[]>;
-  public messagesLoading$: Observable<boolean>;
+  public messagesShowable$: Observable<null>;
   public chatVisible = false;
   private conversationUid: string;
   private subscriptions: Subscription[] = [];
@@ -36,10 +37,15 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   ngOnInit(): void {
+    // TODO: add virtual scroll
     this.conversationUid = this.route.snapshot.paramMap.get('uid');
-    this.messagesLoading$ = this.store.select(selectConversationMessagesLoading(), this.conversationUid);
     this.messages$ = this.store.select(selectConversationMessages(), this.conversationUid);
-    this.store.dispatch(new ConversationMessageLoad({ conversationUid: this.conversationUid }));
+    this.messagesShowable$ = this.store.select(selectConversationMessages(), this.conversationUid)
+      .pipe(
+        debounceTime(200),
+        map(() => null),
+        first()
+      );
     this.subscriptions.push(
       this.chatDispatcher.messageFromOtherUser$
         .subscribe(isFromOtherUser => {
@@ -48,21 +54,13 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   ngAfterViewInit(): void {
-    this.subscriptions.push(
-      this.messagesLoading$
-        .subscribe((loading: boolean) => {
-          if (!loading) {
-            setTimeout(() => {
-              this.renderer.setProperty(this.conversationPage.nativeElement, 'scrollTop', this.messageList.nativeElement.offsetHeight);
-              this.chatVisible = true;
-            }, 0);
-          }
-        })
-    );
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.messagesShowable$
+      .subscribe(() => {
+        setTimeout(() => {
+          this.renderer.setProperty(this.conversationPage.nativeElement, 'scrollTop', this.messageList.nativeElement.offsetHeight);
+          this.chatVisible = true;
+        }, 0);
+      });
   }
 
   /* region API */

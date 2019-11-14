@@ -59,7 +59,7 @@ export class ConversationEffects {
   );
 
   @Effect()
-  addConversation = this.actions$
+  addConversation$ = this.actions$
     .pipe(
       ofType(ConversationActionTypes.ConversationAdd as string),
       switchMap((action: ConversationAdd) => {
@@ -84,9 +84,9 @@ export class ConversationEffects {
       const snapshotChanges = this.afs.collection<FirebaseMessage>(
         `${CONVERSATIONS_PATH}/${action.payload.conversationUid}/${MESSAGES_PATH}`,
         ref => {
-          return ref.where('sentAt', '<=', START_OF_TODAY)
+          return ref
             .orderBy('sentAt')
-            .limit(20);
+            .limit(50);
         }
       ).snapshotChanges(['added']).pipe(first());
 
@@ -119,7 +119,9 @@ export class ConversationEffects {
         return this.afs.collection(
           `${CONVERSATIONS_PATH}/${id}/${MESSAGES_PATH}`,
           ref => {
-            return ref.where('sentAt', '>=', START_OF_TODAY).orderBy('sentAt');
+            return ref
+              .orderBy('sentAt', 'desc')
+              .limit(50);
           }
         ).stateChanges();
       });
@@ -135,7 +137,7 @@ export class ConversationEffects {
   );
 
   @Effect()
-  conversationMessageAdded = this.actions$
+  conversationMessageAdded$ = this.actions$
     .pipe(
       ofType(ConversationActionTypes.ConversationMessageAdded as string),
       tap((action: ConversationMessageAdded) => {
@@ -147,7 +149,7 @@ export class ConversationEffects {
     );
 
   @Effect()
-  addMessage = this.actions$
+  addMessage$ = this.actions$
     .pipe(
       ofType(ConversationActionTypes.ConversationMessageAdd as string),
       switchMap((action: ConversationMessageAdd) => {
