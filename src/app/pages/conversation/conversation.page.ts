@@ -18,7 +18,7 @@ const SCROLL_INTO_VIEW_TIMEOUT = 50;
   templateUrl: './conversation.page.html',
   styleUrls: ['./conversation.page.scss'],
 })
-export class ConversationPageComponent implements OnInit, AfterViewInit {
+export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestroy {
   public messages$: Observable<Message[]>;
   public messagesShowable$: Observable<null>;
   public chatVisible = false;
@@ -61,6 +61,10 @@ export class ConversationPageComponent implements OnInit, AfterViewInit {
           this.chatVisible = true;
         }, 0);
       });
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
 
   /* region API */
