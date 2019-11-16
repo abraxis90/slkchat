@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore, DocumentChangeAction } from '@angular/fire/firestore';
 import { Action, Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { first, map, mergeMap, switchMap } from 'rxjs/operators';
+import { debounceTime, first, map, mergeMap, switchMap } from 'rxjs/operators';
 import { combineLatest, from, Observable, of } from 'rxjs';
 
 import { Conversation, CONVERSATIONS_PATH, FirebaseConversation } from './conversation';
@@ -48,7 +48,7 @@ export class ConversationEffects {
           uid: action.payload.doc.id,
           ...action.payload.doc.data(),
           messages: [],
-          messagesLoading: true
+          oldMessages: []
         }
       };
     })
@@ -77,14 +77,26 @@ export class ConversationEffects {
   messageLoad$: Observable<Action> = this.actions$.pipe(
     ofType(ConversationActionTypes.ConversationMessageLoad as string),
     switchMap((action: ConversationMessageLoad) => {
-      const snapshotChanges = this.afs.collection<FirebaseMessage>(
-        `${CONVERSATIONS_PATH}/${action.payload.conversationUid}/${MESSAGES_PATH}`,
-        ref => {
-          return ref
-            .orderBy('sentAt')
-            .limit(50);
-        }
-      ).snapshotChanges(['added']).pipe(first());
+      const docPath = `${CONVERSATIONS_PATH}/${action.payload.conversationUid}/${MESSAGES_PATH}/${action.payload.lastMessageUid}`;
+
+      const snapshotChanges = this.afs.doc(docPath).snapshotChanges()
+        .pipe(
+          map(change => {
+            return change.payload;
+          }),
+          switchMap(lastMessageSnapshot => {
+            return this.afs.collection<FirebaseMessage>(
+              `${CONVERSATIONS_PATH}/${action.payload.conversationUid}/${MESSAGES_PATH}`,
+              ref => {
+                return ref
+                  .orderBy('sentAt', 'desc')
+                  .startAfter(lastMessageSnapshot)
+                  .limit(50);
+              }
+            ).snapshotChanges(['added']).pipe(first());
+          }),
+          first()
+        );
 
       return combineLatest([snapshotChanges, of(action.payload.conversationUid)]);
     }),
@@ -106,10 +118,13 @@ export class ConversationEffects {
     })
   );
 
+  // TODO: handle newly added/removed conversations properly; perhaps merge with conversation querying
   @Effect()
   latestMessagesQuery$: Observable<Action> = this.actions$.pipe(
     ofType(ConversationActionTypes.ConversationMessageQueryAll),
-    switchMap((action: ConversationMessageQueryAll) => this.store.select(selectConversationIds)),
+    switchMap((action: ConversationMessageQueryAll) => {
+      return this.store.select(selectConversationIds).pipe(debounceTime(100));
+    }),
     switchMap((conversationIds: string[]) => {
       return conversationIds.map(id => {
         return this.afs.collection(

@@ -10,6 +10,7 @@ import {
   MatToolbarModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 @NgModule({
   imports: [
@@ -22,7 +23,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatIconModule,
     MatDialogModule,
     MatProgressSpinnerModule,
-    MatInputModule
+    MatInputModule,
+    ScrollingModule
   ],
   exports: [
     BrowserAnimationsModule,
@@ -33,7 +35,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     MatIconModule,
     MatDialogModule,
     MatProgressSpinnerModule,
-    MatInputModule
+    MatInputModule,
+    ScrollingModule
   ]
 })
 export class AMaterialModule {

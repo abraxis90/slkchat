@@ -78,7 +78,7 @@ export class ConversationMessageLoad implements Action {
   // load by conversationUid
   constructor(public payload: {
     conversationUid: string,
-    lastMessage?: DocumentSnapshot<Message>
+    lastMessageUid?: string
   }) {}
 }
 

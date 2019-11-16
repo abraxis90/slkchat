@@ -22,19 +22,12 @@ export function conversationReducer(state = initialState,
         changes: action.payload
       }, state);
 
-    case ConversationActionTypes.ConversationMessageLoad:
-      return ConversationAdapter.updateOne({
-        id: action.payload.conversationUid,
-        changes: { messagesLoading: true }
-      }, state);
-
     case ConversationActionTypes.ConversationMessageLoadSuccess:
       return ConversationAdapter.updateOne({
         id: action.payload.conversationUid,
         changes: {
-          messagesLoading: false,
-          messages: action.payload.messages
-            .concat(state.entities[action.payload.conversationUid].messages)
+          oldMessages: action.payload.messages
+            .concat(state.entities[action.payload.conversationUid].oldMessages)
             .sort((msgA, msgB) => msgA.sentAt.seconds - msgB.sentAt.seconds)
         }
       }, state);

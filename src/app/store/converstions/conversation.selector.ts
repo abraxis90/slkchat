@@ -43,16 +43,23 @@ export const selectConversationsByUserUids = () =>
     }
   );
 
-export const selectConversationMessagesLoading = () =>
-  createSelector(
-    selectConversationEntities,
-    (conversationEntities, conversationUid) => conversationEntities[conversationUid] ?
-      conversationEntities[conversationUid].messagesLoading : false
-  );
-
 export const selectConversationMessages = () =>
   createSelector(
     selectConversationEntities,
     (conversationEntities, conversationUid) => conversationEntities[conversationUid] ?
       conversationEntities[conversationUid].messages : []
+  );
+
+export const selectOldConversationMessages = () =>
+  createSelector(
+    selectConversationEntities,
+    (conversationEntities, conversationUid) => conversationEntities[conversationUid] ?
+      conversationEntities[conversationUid].oldMessages : []
+  );
+
+export const selectConversationFirstMessageUid = () =>
+  createSelector(
+    selectConversationEntities,
+    (conversationEntities, conversationUid) => conversationEntities[conversationUid] ?
+      conversationEntities[conversationUid].firstMessageUid : ''
   );

@@ -1,7 +1,8 @@
-<div class="conversation-page" #conversationPage fxLayout="column" fxLayoutAlign="space-between start">
+<div class="conversation-page" #conversationPage fxLayout="column" fxLayoutAlign="space-between start" cdkScrollable>
   
   <div class="message-list mat-body" [ngClass]="{'visible': chatVisible}" #messageList>
     <div *ngIf="(messages$ | async) as messages">
+      <app-chat-bubble *ngFor="let oldMessage of oldMessages$ | async" [message]="oldMessage"></app-chat-bubble>
       <app-chat-bubble *ngFor="let message of messages" [message]="message"></app-chat-bubble>
     </div>
     <div #messagesEnd class="messages-end"></div>

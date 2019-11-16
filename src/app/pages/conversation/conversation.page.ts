@@ -1,13 +1,19 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { concat, Observable, Subscription } from 'rxjs';
-import { FirebaseMessage, Message } from '../../store/messages/message';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AuthenticationService } from '../../services/auth/authentication.service';
-import { firestore } from 'firebase/app';
 import { Store } from '@ngrx/store';
-import { ConversationMessageAdd } from '../../store/converstions/conversation.actions';
-import { selectConversationMessages } from '../../store/converstions/conversation.selector';
-import { debounceTime, first, map, throttleTime } from 'rxjs/operators';
+import { concat, Observable, Subscription } from 'rxjs';
+import { firestore } from 'firebase/app';
+import { debounceTime, first, map, tap, throttleTime, withLatestFrom } from 'rxjs/operators';
+
+import { AuthenticationService } from '../../services/auth/authentication.service';
+import { FirebaseMessage, Message } from '../../store/messages/message';
+import { ConversationMessageAdd, ConversationMessageLoad } from '../../store/converstions/conversation.actions';
+import {
+  selectConversationFirstMessageUid,
+  selectConversationMessages,
+  selectOldConversationMessages
+} from '../../store/converstions/conversation.selector';
+import { ScrollDispatcher } from '@angular/cdk/overlay';
 
 const SCROLL_INTO_VIEW_OPTS: ScrollIntoViewOptions = { behavior: 'auto', block: 'start' };
 const SCROLL_INTO_VIEW_TIMEOUT = 50;
@@ -24,8 +30,11 @@ interface MessageChanges {
 })
 export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestroy {
   public messages$: Observable<Message[]>;
-  public messageChanges$: Observable<MessageChanges>;
+  public oldMessages$: Observable<Message[]>;
   public chatVisible = false;
+  private messageChanges$: Observable<MessageChanges>;
+  private firstConversationMessageUid$: Observable<string>;
+  private firstFetchedMessageUid: string;
   private conversationUid: string;
   private subscriptions: Subscription[] = [];
 
@@ -35,15 +44,15 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
 
   constructor(private route: ActivatedRoute,
               private auth: AuthenticationService,
-              private renderer: Renderer2,
+              private scrollDispatcher: ScrollDispatcher,
               private store: Store<{ messages: Message[] }>) {}
 
   ngOnInit(): void {
-    // TODO: add virtual scroll
     this.conversationUid = this.route.snapshot.paramMap.get('uid');
     this.messages$ = this.store.select(selectConversationMessages(), this.conversationUid);
     const firstMessageBatch$ = this.messages$.pipe(
-      debounceTime(200),
+      debounceTime(400),
+      tap(messages => messages.length ? this.firstFetchedMessageUid = messages[0].uid : this.firstFetchedMessageUid = undefined),
       map(_ => {
         return {
           isFirstMessageBatch: true,
@@ -62,6 +71,11 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
       })
     );
     this.messageChanges$ = concat(firstMessageBatch$, nextMessages$);
+    this.oldMessages$ = this.store.select(selectOldConversationMessages(), this.conversationUid)
+      .pipe(
+        tap(messages => messages.length ? this.firstFetchedMessageUid = messages[0].uid : undefined)
+      );
+    this.firstConversationMessageUid$ = this.store.select(selectConversationFirstMessageUid(), this.conversationUid);
   }
 
   ngAfterViewInit(): void {
@@ -71,7 +85,25 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
           this.chatVisible = true;
         }
         this.handleMessageReceived(messageChanges);
-      })
+      }),
+      this.scrollDispatcher.scrolled(200)
+        .pipe(
+          debounceTime(200),
+          withLatestFrom(this.firstConversationMessageUid$)
+        )
+        .subscribe(([_, firstMessageUid]) => {
+          const isContentLoadable = this.firstFetchedMessageUid && firstMessageUid.length &&
+            this.firstFetchedMessageUid !== firstMessageUid;
+          if (isContentLoadable && this.conversationPage.nativeElement.scrollTop < 200) {
+            // tell store to load more messages by specifying the currently last message (displayed in descending order)
+            this.store.dispatch(new ConversationMessageLoad(
+              {
+                conversationUid: this.conversationUid,
+                lastMessageUid: this.firstFetchedMessageUid
+              })
+            );
+          }
+        })
     );
   }
 
