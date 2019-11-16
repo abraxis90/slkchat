@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFirestore, DocumentChangeAction } from '@angular/fire/firestore';
 import { Action, Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { ChatDispatcherService, START_OF_TODAY } from '../../services/chat-dispatcher/chat-dispatcher.service';
-import { first, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { first, map, mergeMap, switchMap } from 'rxjs/operators';
 import { combineLatest, from, Observable, of } from 'rxjs';
 
 import { Conversation, CONVERSATIONS_PATH, FirebaseConversation } from './conversation';
@@ -12,11 +11,9 @@ import {
   ConversationAdd,
   ConversationAddSuccess,
   ConversationMessageAdd,
-  ConversationMessageAdded,
   ConversationMessageAddSuccess,
   ConversationMessageLoad,
   ConversationMessageLoadSuccess,
-  ConversationMessageNoop,
   ConversationMessageQueryAll,
   ConversationQuery,
 } from './conversation.actions';
@@ -30,8 +27,7 @@ export class ConversationEffects {
   constructor(private readonly afs: AngularFirestore,
               private readonly auth: AuthenticationService,
               private readonly store: Store<Conversation>,
-              private actions$: Actions,
-              private chatDispatcher: ChatDispatcherService) {}
+              private actions$: Actions) {}
 
   /* region CONVERSATIONS */
 
@@ -135,18 +131,6 @@ export class ConversationEffects {
       };
     })
   );
-
-  @Effect()
-  conversationMessageAdded$ = this.actions$
-    .pipe(
-      ofType(ConversationActionTypes.ConversationMessageAdded as string),
-      tap((action: ConversationMessageAdded) => {
-        this.chatDispatcher.messageFromOtherUser$.next(action.payload && action.payload.from !== this.auth.state.value.uid);
-      }),
-      map(() => {
-        return new ConversationMessageNoop();
-      })
-    );
 
   @Effect()
   addMessage$ = this.actions$

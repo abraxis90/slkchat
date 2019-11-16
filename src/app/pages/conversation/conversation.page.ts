@@ -1,6 +1,5 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
-import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispatcher.service';
+import { concat, Observable, Subscription } from 'rxjs';
 import { FirebaseMessage, Message } from '../../store/messages/message';
 import { ActivatedRoute } from '@angular/router';
 import { AuthenticationService } from '../../services/auth/authentication.service';
@@ -8,10 +7,15 @@ import { firestore } from 'firebase/app';
 import { Store } from '@ngrx/store';
 import { ConversationMessageAdd } from '../../store/converstions/conversation.actions';
 import { selectConversationMessages } from '../../store/converstions/conversation.selector';
-import { debounceTime, first, map } from 'rxjs/operators';
+import { debounceTime, first, map, throttleTime } from 'rxjs/operators';
 
 const SCROLL_INTO_VIEW_OPTS: ScrollIntoViewOptions = { behavior: 'auto', block: 'start' };
 const SCROLL_INTO_VIEW_TIMEOUT = 50;
+
+interface MessageChanges {
+  isFirstMessageBatch: boolean;
+  isFromOtherUser: boolean;
+}
 
 @Component({
   selector: 'app-conversations-page',
@@ -20,7 +24,7 @@ const SCROLL_INTO_VIEW_TIMEOUT = 50;
 })
 export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestroy {
   public messages$: Observable<Message[]>;
-  public messagesShowable$: Observable<null>;
+  public messageChanges$: Observable<MessageChanges>;
   public chatVisible = false;
   private conversationUid: string;
   private subscriptions: Subscription[] = [];
@@ -30,37 +34,45 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
   @ViewChild('messagesEnd', { static: true }) messageEnd: ElementRef;
 
   constructor(private route: ActivatedRoute,
-              private chatDispatcher: ChatDispatcherService,
               private auth: AuthenticationService,
               private renderer: Renderer2,
-              private store: Store<{ messages: Message[] }>) {
-  }
+              private store: Store<{ messages: Message[] }>) {}
 
   ngOnInit(): void {
     // TODO: add virtual scroll
     this.conversationUid = this.route.snapshot.paramMap.get('uid');
     this.messages$ = this.store.select(selectConversationMessages(), this.conversationUid);
-    this.messagesShowable$ = this.store.select(selectConversationMessages(), this.conversationUid)
-      .pipe(
-        debounceTime(200),
-        map(() => null),
-        first()
-      );
-    this.subscriptions.push(
-      this.chatDispatcher.messageFromOtherUser$
-        .subscribe(isFromOtherUser => {
-          this.handleMessageReceived(isFromOtherUser);
-        }));
+    const firstMessageBatch$ = this.messages$.pipe(
+      debounceTime(200),
+      map(_ => {
+        return {
+          isFirstMessageBatch: true,
+          isFromOtherUser: true
+        } as MessageChanges;
+      }),
+      first()
+    );
+    const nextMessages$ = this.messages$.pipe(
+      throttleTime(200),
+      map((messages: Message[]) => {
+        return {
+          isFirstMessageBatch: false,
+          isFromOtherUser: messages[messages.length - 1] ? messages[messages.length - 1].from !== this.auth.state.value.uid : false
+        } as MessageChanges;
+      })
+    );
+    this.messageChanges$ = concat(firstMessageBatch$, nextMessages$);
   }
 
   ngAfterViewInit(): void {
-    this.messagesShowable$
-      .subscribe(() => {
-        setTimeout(() => {
-          this.renderer.setProperty(this.conversationPage.nativeElement, 'scrollTop', this.messageList.nativeElement.offsetHeight);
+    this.subscriptions.push(
+      this.messageChanges$.subscribe((messageChanges: MessageChanges) => {
+        if (messageChanges.isFirstMessageBatch) {
           this.chatVisible = true;
-        }, 0);
-      });
+        }
+        this.handleMessageReceived(messageChanges);
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -79,8 +91,8 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
     this.store.dispatch(new ConversationMessageAdd(firebaseMessage));
   }
 
-  private handleMessageReceived(isFromOtherUser: boolean): void {
-    if (!isFromOtherUser) {
+  private handleMessageReceived(messageChanges: MessageChanges): void {
+    if (messageChanges.isFirstMessageBatch || !messageChanges.isFromOtherUser) {
       this.scrollIntoView(this.messageEnd);
     } else {
       if (this.messageList.nativeElement.offsetHeight - this.conversationPage.nativeElement.scrollTop < 1000) {

@@ -7,7 +7,6 @@ import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
 import { AuthenticationService } from './services/auth/authentication.service';
-import { ChatDispatcherService } from './services/chat-dispatcher/chat-dispatcher.service';
 import { User } from './store/users/user';
 import { UserQuery } from './store/users/user.actions';
 import { ConversationMessageQueryAll, ConversationQuery } from './store/converstions/conversation.actions';
@@ -25,7 +24,6 @@ export class AppComponent {
               private router: Router,
               private store: Store<{ users: User[] }>,
               private matIconRegistry: MatIconRegistry,
-              private chatDispatcher: ChatDispatcherService,
               private domSanitizer: DomSanitizer) {
 
     // INIT

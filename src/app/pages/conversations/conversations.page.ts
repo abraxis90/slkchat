@@ -11,7 +11,6 @@ import { User } from '../../store/users/user';
 import { selectAllConversations, selectConversationsByUserUids } from '../../store/converstions/conversation.selector';
 import { selectAllUsers } from '../../store/users/user.selector';
 import { ContactListComponent } from '../../reusables/components/contact-list/contact-list.component';
-import { ChatDispatcherService } from '../../services/chat-dispatcher/chat-dispatcher.service';
 import { AuthenticationService } from '../../services/auth/authentication.service';
 import { ConversationAdd } from '../../store/converstions/conversation.actions';
 
@@ -49,7 +48,6 @@ export class ConversationsPageComponent {
     );
 
   constructor(private store: Store<{ users: User[], conversations: Conversation[] }>,
-              private chatDispatcher: ChatDispatcherService,
               private router: Router,
               private route: ActivatedRoute,
               private auth: AuthenticationService,
