@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { ScrollDispatcher } from '@angular/cdk/overlay';
 import { Store } from '@ngrx/store';
 import { concat, Observable, Subscription } from 'rxjs';
 import { firestore } from 'firebase/app';
@@ -7,13 +8,18 @@ import { debounceTime, first, map, takeWhile, tap, throttleTime, withLatestFrom 
 
 import { AuthenticationService } from '../../services/auth/authentication.service';
 import { FirebaseMessage, Message } from '../../store/messages/message';
-import { ConversationMessageAdd, ConversationMessageDump, ConversationMessageLoad } from '../../store/converstions/conversation.actions';
+import {
+  ConversationClosed,
+  ConversationMessageAdd,
+  ConversationMessageDump,
+  ConversationMessageLoad,
+  ConversationOpened
+} from '../../store/converstions/conversation.actions';
 import {
   selectConversationFirstMessageUid,
   selectConversationMessages,
   selectOldConversationMessages
 } from '../../store/converstions/conversation.selector';
-import { ScrollDispatcher } from '@angular/cdk/overlay';
 
 const SCROLL_INTO_VIEW_OPTS: ScrollIntoViewOptions = { behavior: 'auto', block: 'start' };
 const SCROLL_INTO_VIEW_TIMEOUT = 50;
@@ -52,7 +58,10 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
     this.messages$ = this.store.select(selectConversationMessages(), this.conversationUid);
     const firstMessageBatch$ = this.messages$.pipe(
       debounceTime(400),
+      // set the first fetched message from the first messages batch
       tap(messages => messages.length ? this.firstFetchedMessageUid = messages[0].uid : this.firstFetchedMessageUid = undefined),
+      // consider the conversation is opened once the first set of messages are returned
+      tap(() => this.store.dispatch(new ConversationOpened(this.conversationUid))),
       map(_ => {
         return {
           isFirstMessageBatch: true,
@@ -111,6 +120,7 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
   ngOnDestroy(): void {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
     this.store.dispatch(new ConversationMessageDump(this.conversationUid));
+    this.store.dispatch(new ConversationClosed(this.conversationUid));
   }
 
   /* region API */

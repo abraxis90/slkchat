@@ -22,6 +22,18 @@ export function conversationReducer(state = initialState,
         changes: action.payload
       }, state);
 
+    case ConversationActionTypes.ConversationOpened:
+      return ConversationAdapter.updateOne({
+        id: action.payload,
+        changes: { opened: true }
+      }, state);
+
+    case ConversationActionTypes.ConversationClosed:
+      return ConversationAdapter.updateOne({
+        id: action.payload,
+        changes: { opened: false }
+      }, state);
+
     case ConversationActionTypes.ConversationMessageLoadSuccess:
       return ConversationAdapter.updateOne({
         id: action.payload.conversationUid,

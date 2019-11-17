@@ -48,7 +48,8 @@ export class ConversationEffects {
           uid: action.payload.doc.id,
           ...action.payload.doc.data(),
           messages: [],
-          oldMessages: []
+          oldMessages: [],
+          opened: false
         }
       };
     })

@@ -12,6 +12,8 @@ export enum ConversationActionTypes {
   ConversationQuery = 'conversation.query',
   ConversationAdded = 'conversation.added',
   ConversationModified = 'conversation.modified',
+  ConversationOpened = 'conversation.opened',
+  ConversationClosed = 'conversation.closed',
   ConversationAdd = 'conversation.add',
   ConversationAddSuccess = 'conversation.add.success',
   ConversationMessageLoad = 'conversation.message.load',
@@ -27,6 +29,8 @@ export type ConversationActions =
   ConversationQuery
   | ConversationAdded
   | ConversationModified
+  | ConversationOpened
+  | ConversationClosed
   | ConversationAdd
   | ConversationAddSuccess
   | ConversationMessageLoad
@@ -56,6 +60,20 @@ export class ConversationModified implements Action {
   readonly type = ConversationActionTypes.ConversationModified;
 
   constructor(public payload: Conversation) {}
+}
+
+/* OPENED */
+export class ConversationOpened implements Action {
+  readonly type = ConversationActionTypes.ConversationOpened;
+
+  constructor(public payload: string) {}
+}
+
+/* CLOSED */
+export class ConversationClosed implements Action {
+  readonly type = ConversationActionTypes.ConversationClosed;
+
+  constructor(public payload: string) {}
 }
 
 /* ADD */

@@ -16,6 +16,7 @@ export class Conversation implements FirebaseConversation {
   constructor(public uid: string | undefined,
               public userUids: string[],
               public messages: Message[],
+              public opened: boolean,
               public oldMessages?: Message[],
               public firstMessageUid?: string) {
   }
