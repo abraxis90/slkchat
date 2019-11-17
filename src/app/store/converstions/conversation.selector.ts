@@ -2,7 +2,6 @@ import { createFeatureSelector, createSelector } from '@ngrx/store';
 
 import { ConversationState } from './conversation.state';
 import { ConversationAdapter } from './conversation.adapter';
-import { Conversation } from './conversation';
 
 const selectConversationState = createFeatureSelector<ConversationState>('conversation');
 const conversationEntitySelectors = ConversationAdapter.getSelectors();
@@ -22,12 +21,11 @@ export const selectConversationIds = createSelector(
   ConversationAdapter.getSelectors().selectIds
 );
 
-export const selectConversationByUid = () => createSelector(
-  selectAllConversations,
-  (conversations: Conversation[], uid) => {
-    return conversations.filter(conversation => conversation.uid === uid)[0];
-  }
-);
+export const selectConversationByUid = () =>
+  createSelector(
+    selectConversationEntities,
+    (conversations, uid) => conversations[uid]
+  );
 
 /**
  * Will return a conversation matching the provided Uids. Otherwise will return an empty array.
@@ -43,6 +41,9 @@ export const selectConversationsByUserUids = () =>
     }
   );
 
+/**
+ * Will return all the current messages belonging to a given conversation.
+ */
 export const selectConversationMessages = () =>
   createSelector(
     selectConversationEntities,
@@ -50,6 +51,10 @@ export const selectConversationMessages = () =>
       conversationEntities[conversationUid].messages : []
   );
 
+/**
+ * Will return all the currently loaded old messages belonging to a given conversation.
+ * Note a message is considered old if it's not in the scope of the currently queried conversation messages.
+ */
 export const selectOldConversationMessages = () =>
   createSelector(
     selectConversationEntities,
@@ -57,9 +62,23 @@ export const selectOldConversationMessages = () =>
       conversationEntities[conversationUid].oldMessages : []
   );
 
+/**
+ * Will return the uid of the first message ever sent in the respective conversation
+ */
 export const selectConversationFirstMessageUid = () =>
   createSelector(
     selectConversationEntities,
     (conversationEntities, conversationUid) => conversationEntities[conversationUid] ?
       conversationEntities[conversationUid].firstMessageUid : ''
+  );
+
+/**
+ * Will return a currently opened conversation. If none available, will return undefined.
+ */
+export const selectOpenedConversation = () =>
+  createSelector(
+    selectAllConversations,
+    (conversations) => {
+      return conversations.filter(conversation => conversation.opened)[0] || undefined;
+    }
   );

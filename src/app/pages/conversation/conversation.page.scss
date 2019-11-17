@@ -8,7 +8,7 @@
     width: 100%;
     box-sizing: border-box;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.5s;
 
     &.visible {
       opacity: 1;

@@ -4,7 +4,7 @@ import { ScrollDispatcher } from '@angular/cdk/overlay';
 import { Store } from '@ngrx/store';
 import { concat, Observable, Subscription } from 'rxjs';
 import { firestore } from 'firebase/app';
-import { debounceTime, first, map, takeWhile, tap, throttleTime, withLatestFrom } from 'rxjs/operators';
+import { debounceTime, filter, first, map, takeWhile, tap, throttleTime, withLatestFrom } from 'rxjs/operators';
 
 import { AuthenticationService } from '../../services/auth/authentication.service';
 import { FirebaseMessage, Message } from '../../store/messages/message';
@@ -16,6 +16,7 @@ import {
   ConversationOpened
 } from '../../store/converstions/conversation.actions';
 import {
+  selectConversationByUid,
   selectConversationFirstMessageUid,
   selectConversationMessages,
   selectOldConversationMessages
@@ -56,12 +57,20 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
   ngOnInit(): void {
     this.conversationUid = this.route.snapshot.paramMap.get('uid');
     this.messages$ = this.store.select(selectConversationMessages(), this.conversationUid);
+    this.firstConversationMessageUid$ = this.store.select(selectConversationFirstMessageUid(), this.conversationUid);
+
+    // ensure conversation is in the store before dispatching
+    this.store.select(selectConversationByUid(), this.conversationUid)
+      .pipe(
+        filter(conversation => conversation),
+        first()
+      )
+      .subscribe(() => this.store.dispatch(new ConversationOpened(this.conversationUid)));
+
     const firstMessageBatch$ = this.messages$.pipe(
       debounceTime(400),
       // set the first fetched message from the first messages batch
       tap(messages => messages.length ? this.firstFetchedMessageUid = messages[0].uid : this.firstFetchedMessageUid = undefined),
-      // consider the conversation is opened once the first set of messages are returned
-      tap(() => this.store.dispatch(new ConversationOpened(this.conversationUid))),
       map(_ => {
         return {
           isFirstMessageBatch: true,
@@ -80,11 +89,12 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
       })
     );
     this.messageChanges$ = concat(firstMessageBatch$, nextMessages$);
+
     this.oldMessages$ = this.store.select(selectOldConversationMessages(), this.conversationUid)
       .pipe(
+        // set the first fetched message whenever oldMessages changes
         tap(messages => messages.length ? this.firstFetchedMessageUid = messages[0].uid : undefined)
       );
-    this.firstConversationMessageUid$ = this.store.select(selectConversationFirstMessageUid(), this.conversationUid);
   }
 
   ngAfterViewInit(): void {

@@ -10,6 +10,7 @@ import { AuthenticationService } from './services/auth/authentication.service';
 import { User } from './store/users/user';
 import { UserQuery } from './store/users/user.actions';
 import { ConversationMessageQueryAll, ConversationQuery } from './store/converstions/conversation.actions';
+import { Conversation } from './store/converstions/conversation';
 
 @Component({
   selector: 'app-root',
@@ -18,17 +19,17 @@ import { ConversationMessageQueryAll, ConversationQuery } from './store/converst
 })
 export class AppComponent {
 
-  public currentUser: Observable<User | null>;
+  public currentUser$: Observable<User | null>;
 
   constructor(private auth: AuthenticationService,
               private router: Router,
-              private store: Store<{ users: User[] }>,
+              private store: Store<{ users: User[], conversations: Conversation[] }>,
               private matIconRegistry: MatIconRegistry,
               private domSanitizer: DomSanitizer) {
 
     // INIT
     // TODO: maybe make dedicated slice
-    this.currentUser = auth.state.pipe(
+    this.currentUser$ = auth.state.pipe(
       tap(user => {
         if (user !== null) {
           this.store.dispatch(new ConversationQuery());
@@ -37,7 +38,6 @@ export class AppComponent {
         }
       })
     );
-
     this.matIconRegistry.addSvgIcon(
       `google_logo`,
       this.domSanitizer.bypassSecurityTrustResourceUrl('../assets/google_logo.svg')

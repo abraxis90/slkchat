@@ -28,10 +28,10 @@ export class ConversationsPageComponent {
     })
   );
   public conversationsDrawable$: Observable<ConversationWithUsers[]> =
-    combineLatest(
+    combineLatest([
       this.conversations$,
       this.users$
-    ).pipe(
+    ]).pipe(
       map(([conversations, users]) => {
         return conversations
           .map((conversation: Conversation) => {

@@ -1,11 +1,13 @@
 <mat-toolbar *ngIf="currentUser">
-  <div *ngIf="currentConversation$ | async as conversation" fxLayout="row" fxLayoutAlign="start center">
+  <div *ngIf="conversationsDrawable$ | async as conversation" fxLayout="row" fxLayoutAlign="start center">
     <button class="back-button" routerLink=".." mat-icon-button aria-label="back button">
       <mat-icon>arrow_back</mat-icon>
     </button>
+    <img class="user-avatar" [src]="conversation?.users[0].avatarURL" alt="avatar"/>
+    <span>{{conversation?.users[0].fullName}}</span>
   </div>
   
-  <div *ngIf="!(currentConversation$ | async)" class="full-width" fxLayout="row" fxLayoutAlign="start center">
+  <div *ngIf="!(conversationsDrawable$ | async)" class="full-width" fxLayout="row" fxLayoutAlign="start center">
     <span>Conversations</span>
     
     <span fxFlex></span>
