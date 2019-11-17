@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { concat, Observable, Subscription } from 'rxjs';
 import { firestore } from 'firebase/app';
-import { debounceTime, first, map, tap, throttleTime, withLatestFrom } from 'rxjs/operators';
+import { debounceTime, first, map, takeWhile, tap, throttleTime, withLatestFrom } from 'rxjs/operators';
 
 import { AuthenticationService } from '../../services/auth/authentication.service';
 import { FirebaseMessage, Message } from '../../store/messages/message';
@@ -86,15 +86,16 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
         }
         this.handleMessageReceived(messageChanges);
       }),
-      this.scrollDispatcher.scrolled(200)
+      this.scrollDispatcher.scrolled()
         .pipe(
-          debounceTime(200),
-          withLatestFrom(this.firstConversationMessageUid$)
+          debounceTime(400),
+          withLatestFrom(this.firstConversationMessageUid$),
+          takeWhile(([_, firstMessageUid]) => {
+            return this.firstFetchedMessageUid && firstMessageUid.length && this.firstFetchedMessageUid !== firstMessageUid;
+          })
         )
-        .subscribe(([_, firstMessageUid]) => {
-          const isContentLoadable = this.firstFetchedMessageUid && firstMessageUid.length &&
-            this.firstFetchedMessageUid !== firstMessageUid;
-          if (isContentLoadable && this.conversationPage.nativeElement.scrollTop < 200) {
+        .subscribe(() => {
+          if (this.conversationPage.nativeElement.scrollTop < 200) {
             // tell store to load more messages by specifying the currently last message (displayed in descending order)
             this.store.dispatch(new ConversationMessageLoad(
               {
