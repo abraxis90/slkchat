@@ -7,7 +7,7 @@ import { debounceTime, first, map, takeWhile, tap, throttleTime, withLatestFrom 
 
 import { AuthenticationService } from '../../services/auth/authentication.service';
 import { FirebaseMessage, Message } from '../../store/messages/message';
-import { ConversationMessageAdd, ConversationMessageLoad } from '../../store/converstions/conversation.actions';
+import { ConversationMessageAdd, ConversationMessageDump, ConversationMessageLoad } from '../../store/converstions/conversation.actions';
 import {
   selectConversationFirstMessageUid,
   selectConversationMessages,
@@ -88,11 +88,11 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
       }),
       this.scrollDispatcher.scrolled()
         .pipe(
-          debounceTime(400),
           withLatestFrom(this.firstConversationMessageUid$),
           takeWhile(([_, firstMessageUid]) => {
             return this.firstFetchedMessageUid && firstMessageUid.length && this.firstFetchedMessageUid !== firstMessageUid;
-          })
+          }),
+          debounceTime(400)
         )
         .subscribe(() => {
           if (this.conversationPage.nativeElement.scrollTop < 200) {
@@ -110,6 +110,7 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.store.dispatch(new ConversationMessageDump(this.conversationUid));
   }
 
   /* region API */

@@ -16,6 +16,7 @@ export enum ConversationActionTypes {
   ConversationAddSuccess = 'conversation.add.success',
   ConversationMessageLoad = 'conversation.message.load',
   ConversationMessageLoadSuccess = 'conversation.message.load.success',
+  ConversationMessageDump = 'conversation.message.dump',
   ConversationMessageQueryAll = 'conversation.message.query.all',
   ConversationMessageAdded = 'conversation.message.added',
   ConversationMessageAdd = 'conversation.message.add',
@@ -30,6 +31,7 @@ export type ConversationActions =
   | ConversationAddSuccess
   | ConversationMessageLoad
   | ConversationMessageLoadSuccess
+  | ConversationMessageDump
   | ConversationMessageQueryAll
   | ConversationMessageAdded
   | ConversationMessageAdd
@@ -90,6 +92,13 @@ export class ConversationMessageLoadSuccess implements Action {
     conversationUid: string,
     messages: Message[]
   }) {}
+}
+
+/* DUMP */
+export class ConversationMessageDump implements Action {
+  readonly type = ConversationActionTypes.ConversationMessageDump;
+
+  constructor(public payload: string) {}
 }
 
 /* QUERY */

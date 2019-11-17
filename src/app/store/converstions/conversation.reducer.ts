@@ -32,6 +32,14 @@ export function conversationReducer(state = initialState,
         }
       }, state);
 
+    case ConversationActionTypes.ConversationMessageDump:
+      return ConversationAdapter.updateOne({
+        id: action.payload,
+        changes: {
+          oldMessages: []
+        }
+      }, state);
+
     case ConversationActionTypes.ConversationMessageAdded:
       return ConversationAdapter.updateOne({
         id: action.payload.conversationUid,
