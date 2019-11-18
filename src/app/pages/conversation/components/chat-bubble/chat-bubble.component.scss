@@ -10,43 +10,32 @@
   position: relative;
   padding: 6px;
   max-width: 80%;
-  background: #546e7a;
+  background: #62757f;
   color: #ffffff;
-  border-radius: 8px;
   @include mat-elevation(1);
 
   &.from-same-user {
-    background: #4e54c8;
+    background: #3f51b5;
+    border-radius: 12px 4px 4px 12px;
 
-    &:after {
-      content: '';
-      position: absolute;
-      right: 0;
-      top: 50%;
-      width: 0;
-      height: 0;
-      border: 8px solid transparent;
-      border-left-color: #4e54c8;
-      border-right: 0;
-      margin-top: -8px;
-      margin-right: -4px;
+    &.head {
+      border-radius: 12px 12px 4px 12px;
+    }
+
+    &.tail {
+      border-radius: 12px 4px 12px 12px;
     }
   }
 
   &.from-other-user {
+    border-radius: 4px 12px 12px 4px;
 
-    &:after {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 50%;
-      width: 0;
-      height: 0;
-      border: 8px solid transparent;
-      border-right-color: #546e7a;
-      border-left: 0;
-      margin-top: -8px;
-      margin-left: -4px;
+    &.head {
+      border-radius: 12px 12px 12px 4px;
+    }
+
+    &.tail {
+      border-radius: 4px 12px 12px 12px;
     }
   }
 

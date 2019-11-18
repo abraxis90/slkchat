@@ -1,5 +1,5 @@
 import { AfterContentInit, Component, Input } from '@angular/core';
-import { Message } from '../../../../store/messages/message';
+import { MessageDrawable, MessageDrawableType } from '../../../../store/messages/message';
 import { AuthenticationService } from '../../../../services/auth/authentication.service';
 
 
@@ -9,8 +9,9 @@ import { AuthenticationService } from '../../../../services/auth/authentication.
   styleUrls: ['./chat-bubble.component.scss']
 })
 export class ChatBubbleComponent implements AfterContentInit {
-  @Input() message: Message;
+  @Input() message: MessageDrawable;
   public isOwnUser: boolean;
+  public MessageDrawableType = MessageDrawableType;
 
   constructor(private auth: AuthenticationService) {
   }

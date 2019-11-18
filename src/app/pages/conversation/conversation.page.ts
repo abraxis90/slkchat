@@ -7,7 +7,7 @@ import { firestore } from 'firebase/app';
 import { debounceTime, filter, first, map, takeWhile, tap, throttleTime, withLatestFrom } from 'rxjs/operators';
 
 import { AuthenticationService } from '../../services/auth/authentication.service';
-import { FirebaseMessage, Message } from '../../store/messages/message';
+import { FirebaseMessage, Message, MessageDrawable, MessageDrawableType } from '../../store/messages/message';
 import {
   ConversationClosed,
   ConversationMessageAdd,
@@ -36,8 +36,8 @@ interface MessageChanges {
   styleUrls: ['./conversation.page.scss'],
 })
 export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestroy {
-  public messages$: Observable<Message[]>;
-  public oldMessages$: Observable<Message[]>;
+  public messages$: Observable<MessageDrawable[]>;
+  public oldMessages$: Observable<MessageDrawable[]>;
   public chatVisible = false;
   private messageChanges$: Observable<MessageChanges>;
   private firstConversationMessageUid$: Observable<string>;
@@ -56,7 +56,11 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
 
   ngOnInit(): void {
     this.conversationUid = this.route.snapshot.paramMap.get('uid');
-    this.messages$ = this.store.select(selectConversationMessages(), this.conversationUid);
+    this.messages$ = this.store.select(selectConversationMessages(), this.conversationUid)
+      .pipe(
+        debounceTime(200),
+        map(this.makeMessagesDrawable)
+      );
     this.firstConversationMessageUid$ = this.store.select(selectConversationFirstMessageUid(), this.conversationUid);
 
     // ensure conversation is in the store before dispatching
@@ -93,7 +97,8 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
     this.oldMessages$ = this.store.select(selectOldConversationMessages(), this.conversationUid)
       .pipe(
         // set the first fetched message whenever oldMessages changes
-        tap(messages => messages.length ? this.firstFetchedMessageUid = messages[0].uid : undefined)
+        tap(messages => messages.length ? this.firstFetchedMessageUid = messages[0].uid : undefined),
+        map(this.makeMessagesDrawable)
       );
   }
 
@@ -163,6 +168,22 @@ export class ConversationPageComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   /* endregion */
+
+  /* UTILS */
+  private makeMessagesDrawable(messages: Message[]): MessageDrawable[] {
+    return messages.map((message, idx) => {
+        if (idx === 0) {
+          return { ...message, type: MessageDrawableType.head };
+        } else if (message.from !== messages[idx - 1].from) {
+          return { ...message, type: MessageDrawableType.head };
+        } else if (idx === messages.length - 1 || message.from !== messages[idx + 1].from) {
+          return { ...message, type: MessageDrawableType.tail };
+        } else {
+          return { ...message, type: MessageDrawableType.none };
+        }
+      }
+    );
+  }
 
 
 }

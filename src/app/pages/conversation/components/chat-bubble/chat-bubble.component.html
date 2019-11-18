@@ -1,4 +1,6 @@
 <span *ngIf="isOwnUser" fxFlex></span>
-<div class="chat-bubble" [ngClass]="{'from-same-user': isOwnUser, 'from-other-user': !isOwnUser}">
-  <p>{{message?.body}}</p>
+<div class="chat-bubble"
+     [ngClass]="{'from-same-user': isOwnUser, 'from-other-user': !isOwnUser,
+     'head': message.type === MessageDrawableType.head, 'tail': message.type === MessageDrawableType.tail}">
+  <p>{{ message?.body }}</p>
 </div>

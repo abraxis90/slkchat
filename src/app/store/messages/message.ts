@@ -3,6 +3,12 @@ import { firestore } from 'firebase/app';
 
 export const MESSAGES_PATH = 'MESSAGES';
 
+export enum MessageDrawableType {
+  none,
+  head,
+  tail
+}
+
 export interface FirebaseMessage {
   conversationUid: string;
   body: string;
@@ -19,4 +25,8 @@ export class Message {
               public received?: MessageReceipt[],
               public sentAt?: firestore.Timestamp) {
   }
+}
+
+export interface MessageDrawable extends Message {
+  type: MessageDrawableType;
 }
