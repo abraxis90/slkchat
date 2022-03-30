@@ -1,6 +1,6 @@
 # Sleek
 
-Simple chat application with authentication.
+Simple chat application with authentication. Uses ngRx to wrap firebase in order to make state management easy in a real-time application.
 
 ## Development server
 
